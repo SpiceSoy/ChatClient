@@ -17,8 +17,10 @@
 
 #define ID_TB_IPADDRESS "TB_IPAddress"
 #define ID_TB_PORT "TB_Port"
+#define ID_TB_CHAT "TB_Chat"
 #define ID_MTB_LOG "MTB_Log"
 #define ID_BTN_CONNECT "BTN_Connect"
+#define ID_BTN_SEND "BTN_Send"
 
 UChatWidget::FConnectBtnPressed& UChatWidget::GetConnectBtnPressed()
 {
@@ -49,12 +51,15 @@ void UChatWidget::NativeOnInitialized()
 
 	TextBoxIp = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_IPADDRESS)));
 	TextBoxPort = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_PORT)));
+	TextBoxChat = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_CHAT)));
 	TextBoxLog = Cast<UMultiLineEditableTextBox>(GetWidgetFromName(TEXT(ID_MTB_LOG)));
 	ConnectButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_CONNECT)));
+	SendButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_SEND)));
 
 	TextBoxIp->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpAddress);
 	TextBoxPort->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpPort);
 	ConnectButton->OnClicked.AddDynamic(this, &UChatWidget::OnConnectBtnPressed);
+	SendButton->OnClicked.AddDynamic(this, &UChatWidget::OnChatSendBtnPressed);
 
 	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::NativeOnInitialized"));
 
@@ -103,6 +108,11 @@ void UChatWidget::OnConnectBtnPressed()
 
 void UChatWidget::OnChatSendBtnPressed()
 {
-
+	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::OnChatSendBtnPressed"));
+	FString str = TextBoxChat->Text.ToString();
+	if (str.Len() == 0) return;
+	str += TEXT("\r\n");
+	ChatSendBtnPressed.Execute(str);
+	//TextBoxChat->SetText(FText::GetEmpty());
 }
 

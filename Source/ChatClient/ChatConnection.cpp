@@ -3,6 +3,8 @@
 
 #include "ChatConnection.h"
 #include "Containers/StringConv.h"
+#include <codecvt>
+#include <vector>
 
 FChatConnection::FChatConnection()
 {
@@ -39,6 +41,15 @@ void FChatConnection::Process()
 	ProcessSend();
 }
 
+void FChatConnection::SendText(const FString& str)
+{
+	if (GetSendBufferSize() < SendBytes + str.Len() * sizeof(WIDECHAR))
+	{
+		GrowSendBuffer();
+	}
+	SendBytes += ConvertToMBCS(str, SendBuffer.GetData() + SendBytes, GetSendBufferSize() - SendBytes);
+}
+
 void FChatConnection::ProcessRecv()
 {
 	int32 byteRecved = 0;
@@ -53,14 +64,29 @@ void FChatConnection::ProcessRecv()
 		if (RecvBytes * 1.5 > GetRecvBufferSize()) GrowRecvBuffer();
 		if (RecvBuffer[RecvBytes - 1] == '\n')
 		{
-			ReceivedLine.Execute(UTF8_TO_TCHAR((ANSICHAR*)RecvBuffer.GetData()));
+			RecvBuffer[RecvBytes - 1] = 0;
+			ReceivedLine.Execute(ConvertToWBCS(RecvBuffer.GetData(), RecvBytes));
 			RecvBytes = 0;
 		}
+		UE_LOG(LogTemp, Log, TEXT("CALL FChatConnection::ProcessRecv"));
 	}
 }
 
 void FChatConnection::ProcessSend()
 {
+	if (SendBytes == 0) return;
+	int32 byteSent = 0;
+	bool result = Socket->Send(SendBuffer.GetData(), SendBytes, byteSent);
+	if (result == false)
+	{
+		//에러처리
+	}
+	else if (byteSent != 0)
+	{
+		FMemory::Memcpy(SendBuffer.GetData(), SendBuffer.GetData() + byteSent, SendBytes - byteSent);
+		UE_LOG(LogTemp, Log, TEXT("CALL FChatConnection::ProcessSend %d"), byteSent);
+		SendBytes -= byteSent;
+	}
 }
 
 void FChatConnection::GrowRecvBuffer()
@@ -81,4 +107,34 @@ int32 FChatConnection::GetRecvBufferSize() const
 int32 FChatConnection::GetSendBufferSize() const
 {
 	return SendBuffer.Num() * SendBuffer.GetTypeSize();
+}
+
+FString FChatConnection::ConvertToWBCS(uint8* buffer, uint32 size)
+{
+	//https://midason.tistory.com/401
+	using codecvt_t = std::codecvt<wchar_t, char, std::mbstate_t>;
+	std::locale loc = std::locale("");
+	codecvt_t const& codecvt = std::use_facet<codecvt_t>(loc);
+	const char* newLast;
+	std::vector<wchar_t> wcharBuffer;
+	wcharBuffer.resize(size);
+	wchar_t* newWCharLast;
+	auto state = std::mbstate_t();
+	auto result = codecvt.in(state, (const char*)buffer, (const char*)(buffer + size), newLast, wcharBuffer.data(), wcharBuffer.data() + size, newWCharLast);
+	return FString(wcharBuffer.data());
+}
+
+uint32 FChatConnection::ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size)
+{
+	//https://midason.tistory.com/401
+	using codecvt_t = std::codecvt<wchar_t, char, std::mbstate_t>;
+	std::locale loc = std::locale("");
+	codecvt_t const& codecvt = std::use_facet<codecvt_t>(loc);
+	char* newLast;
+	std::vector<wchar_t> wcharBuffer;
+	wcharBuffer.resize(size);
+	const wchar_t* newWCharLast;
+	auto state = std::mbstate_t();
+	auto result = codecvt.out(state, *srcStr, *srcStr + size, newWCharLast, (char*)destBuffer, (char*)(destBuffer + size), newLast);
+	return newLast - (char*)destBuffer;
 }

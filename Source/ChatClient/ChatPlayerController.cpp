@@ -68,6 +68,16 @@ void AChatPlayerController::AddDelegates()
 		}
 	);
 
+	ChatWidget->GetChatSendBtnPressed().BindLambda(
+		[thisObjPtr](const FString& str)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			AChatPlayerController* thisPtr = thisObjPtr.Get();
+			thisPtr->ChatConnection->SendText(str);
+			UE_LOG(LogTemp, Log, TEXT("CALL AChatPlayerController::SendText"));
+		}
+	);
+
 	ChatConnection->GetReceivedLine().BindLambda(
 		[thisObjPtr](const FString& text) {
 			if (!thisObjPtr.IsValid()) return;

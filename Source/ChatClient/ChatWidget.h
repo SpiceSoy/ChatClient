@@ -40,10 +40,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UEditableTextBox* TextBoxPort;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UEditableTextBox* TextBoxChat;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UMultiLineEditableTextBox* TextBoxLog;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ConnectButton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UButton* SendButton;
 
 	FConnectBtnPressed ConnectBtnPressed;
 	FChatSendBtnPressed ChatSendBtnPressed;

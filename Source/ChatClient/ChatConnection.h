@@ -33,6 +33,7 @@ public:
 	FReceivedLine& GetReceivedLine();
 	bool Connect(uint32 address, uint32 port);
 	void Process();
+	void SendText(const FString& str);
 private:
 	TArray<uint8> RecvBuffer;
 	int32 RecvBytes = 0;
@@ -50,4 +51,6 @@ private:
 	void GrowSendBuffer();
 	int32 GetRecvBufferSize() const;
 	int32 GetSendBufferSize() const;
+	static FString ConvertToWBCS(uint8* srcBuffer, uint32 size);
+	static uint32 ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size);
 };
