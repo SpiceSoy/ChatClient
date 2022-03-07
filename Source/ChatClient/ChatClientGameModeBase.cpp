@@ -2,4 +2,9 @@
 
 
 #include "ChatClientGameModeBase.h"
+#include "ChatPlayerController.h"
 
+AChatClientGameModeBase::AChatClientGameModeBase()
+{
+	PlayerControllerClass = AChatPlayerController::StaticClass();
+}
