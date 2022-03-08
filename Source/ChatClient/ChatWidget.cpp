@@ -9,8 +9,8 @@
 //=================================================================================================
 
 
-#include "ChatPlayerController.h"
 #include "ChatWidget.h"
+#include "ChatPlayerController.h"
 #include "CommandButton.h"
 #include "Networking.h"
 #include "UserData.h"
@@ -59,6 +59,11 @@ void UChatWidget::AppendLog(const FText& text) const
 	AppendLog(text.ToString());
 }
 
+void UChatWidget::SetUserList(const TArray<class UUserData*>& arr) const
+{
+	ListViewUser->SetListItems(arr);
+}
+
 void UChatWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -85,20 +90,6 @@ void UChatWidget::NativeOnInitialized()
 	WrapBoxCommand = Cast<UWrapBox>(GetWidgetFromName(ID_WB_COMMAND));
 
 	ListViewUser = Cast<UListView>(GetWidgetFromName(ID_LV_USER));
-
-	
-	UUserData* userData = NewObject<UUserData>();
-	if(userData) 
-	{
-		userData->Set(TEXT("User0"), TEXT("127.0.0.1"));
-		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::userData CREATE SUC"));
-		users.Add(userData);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::userData CREATE FAIELD"));
-	}
-	ListViewUser->SetListItems(users);
 
 	TWeakObjectPtr< UChatWidget > thisObjPtr(this);
 	if (ClassCommandButton)
@@ -204,7 +195,7 @@ void UChatWidget::OnConnectBtnPressed()
 	{
 		uint32 address = ipAddr.Value;
 		uint32 portNum = FCString::Atoi(*portString);
-		ConnectBtnPressed.Execute(address, portNum);
+		if(ConnectBtnPressed.IsBound()) ConnectBtnPressed.Execute(address, portNum);
 	}
 	else
 	{
@@ -217,7 +208,7 @@ void UChatWidget::OnChatSendBtnPressed()
 	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::OnChatSendBtnPressed"));
 	FString str = TextBoxChat->Text.ToString();
 	if (str.Len() == 0) return;
-	ChatSendBtnPressed.Execute(str);
+	if (ChatSendBtnPressed.IsBound()) ChatSendBtnPressed.Execute(str);
 	TextBoxChat->SetText(FText::GetEmpty());
 }
 

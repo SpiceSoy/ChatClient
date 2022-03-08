@@ -15,26 +15,32 @@
 #include "Networking.h"
 #include "Sockets.h"
 #include "SocketSubsystem.h"
+#include "Command/CommandProcessor.h"
 #include "Containers/Queue.h"
+#include "ChatConnection.generated.h"
 
+
+class FCommandProcessor;
+class UChatWidget;
 /**
  * 
  */
-class CHATCLIENT_API FChatConnection
+ UCLASS()
+class CHATCLIENT_API UChatConnection : public UObject
 {
-	DECLARE_DELEGATE_OneParam(FLineReceived, const FString&);
-	DECLARE_DELEGATE(FClosedSession);
-public:
-	FChatConnection();
-	~FChatConnection();
 
-	FLineReceived& GetLineReceived();
-	FClosedSession& GetClosedSession();
+	 GENERATED_BODY()
+
+public:
+	UChatConnection();
+	~UChatConnection();
+	FCommandProcessor& GetCommandProcessor();
 
 	bool Connect(uint32 address, uint32 port);
 	void Close();
 	void Process();
 	void SendText(const FString& str);
+	void SetWidget(const TWeakObjectPtr<UChatWidget>& ptr);
 private:
 	TArray<uint8> RecvBuffer;
 	int32 RecvBytes = 0;
@@ -43,9 +49,13 @@ private:
 	class FSocket* Socket = nullptr;
 	class FRunnableThread* RunRead = nullptr;
 	bool IsConnected = false;
+	TWeakObjectPtr<UChatWidget> ChatWidget;
+	FCommandProcessor CommandProcessor;
 
-	FLineReceived LineReceived;
-	FClosedSession ClosedSession;
+	void OnSessionClosed();
+	void OnLineReceived(const FString& line);
+	void BindDelegate();
+
 private:
 	void ProcessRecv();
 	void ProcessSend();

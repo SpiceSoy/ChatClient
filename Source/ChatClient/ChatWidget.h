@@ -31,6 +31,7 @@ public:
 	FChatSendBtnPressed& GetChatSendBtnPressed();
 	void AppendLog(const FString& str) const;
 	void AppendLog(const FText& text) const;
+	void SetUserList(const TArray<class UUserData*>& arr) const;
 protected:
 	virtual void NativeOnInitialized() override;
 	

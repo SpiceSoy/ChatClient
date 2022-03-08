@@ -4,6 +4,7 @@
 #include "UserData.h"
 
 UUserData::UUserData()
+	: UObject()
 {
 	Set(TEXT("ERROR_NAME"), TEXT("ERR.ERR.ERR.ERR"));
 }

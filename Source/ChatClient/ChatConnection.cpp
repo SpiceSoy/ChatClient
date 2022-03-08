@@ -2,32 +2,29 @@
 
 
 #include "ChatConnection.h"
+#include "ChatWidget.h"
+#include "Command/CommandProcessor.h"
 #include "Containers/StringConv.h"
 #include <codecvt>
 #include <vector>
 
-FChatConnection::FChatConnection()
+UChatConnection::UChatConnection()
 {
 	RecvBuffer.Init(0, 1024);
 	SendBuffer.Init(0, 1024);
 }
 
-FChatConnection::~FChatConnection()
+UChatConnection::~UChatConnection()
 {
 	Close();
 }
 
-FChatConnection::FLineReceived& FChatConnection::GetLineReceived()
+FCommandProcessor& UChatConnection::GetCommandProcessor()
 {
-	return LineReceived;
+	return CommandProcessor;
 }
 
-FChatConnection::FClosedSession& FChatConnection::GetClosedSession()
-{
-	return ClosedSession;
-}
-
-bool FChatConnection::Connect(uint32 address, uint32 port)
+bool UChatConnection::Connect(uint32 address, uint32 port)
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
 
@@ -40,24 +37,24 @@ bool FChatConnection::Connect(uint32 address, uint32 port)
 	return IsConnected;
 }
 
-void FChatConnection::Close()
+void UChatConnection::Close()
 {
 	if (IsConnected)
 	{
 		Socket->Close();
-		ClosedSession.Execute();
+		OnSessionClosed();
 		IsConnected = false;
 	}
 }
 
-void FChatConnection::Process()
+void UChatConnection::Process()
 {
 	if (!IsConnected) return;
 	ProcessRecv();
 	ProcessSend();
 }
 
-void FChatConnection::SendText(const FString& str)
+void UChatConnection::SendText(const FString& str)
 {
 	if (!IsConnected) return;
 	if (GetSendBufferSize() < SendBytes + str.Len() * sizeof(WIDECHAR))
@@ -67,7 +64,64 @@ void FChatConnection::SendText(const FString& str)
 	SendBytes += ConvertToMBCS(str, SendBuffer.GetData() + SendBytes, GetSendBufferSize() - SendBytes);
 }
 
-void FChatConnection::ProcessRecv()
+void UChatConnection::SetWidget(const TWeakObjectPtr<UChatWidget>& ptr)
+{
+	ChatWidget = ptr;
+	BindDelegate();
+}
+
+void UChatConnection::OnSessionClosed()
+{
+	if (ChatWidget.IsValid()) ChatWidget->AppendLog(TEXT("연결이 종료되었습니다.\n"));
+}
+
+void UChatConnection::OnLineReceived(const FString& line)
+{
+	if (ChatWidget.IsValid()) ChatWidget->AppendLog(line);
+}
+
+void UChatConnection::BindDelegate()
+{
+	if (!ChatWidget.IsValid()) return;
+
+	TWeakObjectPtr<UChatConnection> thisObjPtr = MakeWeakObjectPtr(this);
+
+	ChatWidget->GetConnectBtnPressed().BindLambda(
+		[thisObjPtr](uint32 address, uint32 port)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!thisPtr->ChatWidget.IsValid()) return;
+			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
+
+			bool connectionResult = thisPtr->Connect(address, port);
+			if (connectionResult) chatWidget->AppendLog(TEXT("연결이 성공하였습니다.\n"));
+			else chatWidget->AppendLog(TEXT("연결이 실패하였습니다.\n"));
+		}
+	);
+
+	ChatWidget->GetChatSendBtnPressed().BindLambda(
+		[thisObjPtr](const FString& str)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			thisPtr->SendText(str);
+		}
+	);
+
+	CommandProcessor.GetChangedUserList().BindLambda(
+		[thisObjPtr](const TArray<UUserData*>& arr)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!thisPtr->ChatWidget.IsValid()) return;
+			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
+			chatWidget->SetUserList(arr);
+		}
+	);
+}
+
+void UChatConnection::ProcessRecv()
 {
 	int32 byteRecved = 0;
 	bool result = Socket->Recv(RecvBuffer.GetData(), RecvBuffer.Num() * RecvBuffer.GetTypeSize(), byteRecved);
@@ -78,18 +132,33 @@ void FChatConnection::ProcessRecv()
 	else if (byteRecved != 0)
 	{
 		RecvBytes += byteRecved;
-		if (RecvBytes * 1.5 > GetRecvBufferSize()) GrowRecvBuffer();
-		if (RecvBuffer[RecvBytes - 1] == '\n')
+		uint8* csrLast = RecvBuffer.GetData();
+		uint8* csrBegin = RecvBuffer.GetData();
+		while (csrLast != (RecvBuffer.GetData() + RecvBytes))
 		{
-			RecvBuffer[RecvBytes - 1] = 0;
-			LineReceived.Execute(ConvertToWBCS(RecvBuffer.GetData(), RecvBytes));
-			RecvBytes = 0;
+			if (*csrLast == '\n')
+			{
+				*csrLast = 0;
+				FString line = ConvertToWBCS(csrBegin, csrLast - csrBegin + 1);
+				if (CommandProcessor.ProcessLine(line)) OnLineReceived(line);
+				csrLast++;
+				csrBegin = csrLast;
+			}
+			else
+			{
+				csrLast++;
+			}
 		}
-		UE_LOG(LogTemp, Log, TEXT("CALL FChatConnection::ProcessRecv"));
+		if (csrBegin != csrLast)
+		{
+			FMemory::Memcpy(RecvBuffer.GetData(), csrBegin, csrLast - csrBegin + 1);
+		}
+		RecvBytes = 0;
+		UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::ProcessRecv"));
 	}
 }
 
-void FChatConnection::ProcessSend()
+void UChatConnection::ProcessSend()
 {
 	if (SendBytes == 0) return;
 	int32 byteSent = 0;
@@ -101,32 +170,32 @@ void FChatConnection::ProcessSend()
 	else if (byteSent != 0)
 	{
 		FMemory::Memcpy(SendBuffer.GetData(), SendBuffer.GetData() + byteSent, SendBytes - byteSent);
-		UE_LOG(LogTemp, Log, TEXT("CALL FChatConnection::ProcessSend %d"), byteSent);
+		UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::ProcessSend %d"), byteSent);
 		SendBytes -= byteSent;
 	}
 }
 
-void FChatConnection::GrowRecvBuffer()
+void UChatConnection::GrowRecvBuffer()
 {
 	RecvBuffer.SetNum(RecvBuffer.Num() * 2);
 }
 
-void FChatConnection::GrowSendBuffer()
+void UChatConnection::GrowSendBuffer()
 {
 	SendBuffer.SetNum(SendBuffer.Num() * 2);
 }
 
-int32 FChatConnection::GetRecvBufferSize() const
+int32 UChatConnection::GetRecvBufferSize() const
 {
 	return RecvBuffer.Num() * RecvBuffer.GetTypeSize();
 }
 
-int32 FChatConnection::GetSendBufferSize() const
+int32 UChatConnection::GetSendBufferSize() const
 {
 	return SendBuffer.Num() * SendBuffer.GetTypeSize();
 }
 
-FString FChatConnection::ConvertToWBCS(uint8* buffer, uint32 size)
+FString UChatConnection::ConvertToWBCS(uint8* buffer, uint32 size)
 {
 	//https://midason.tistory.com/401
 	using codecvt_t = std::codecvt<wchar_t, char, std::mbstate_t>;
@@ -141,7 +210,7 @@ FString FChatConnection::ConvertToWBCS(uint8* buffer, uint32 size)
 	return FString(wcharBuffer.data());
 }
 
-uint32 FChatConnection::ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size)
+uint32 UChatConnection::ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size)
 {
 	//https://midason.tistory.com/401
 	using codecvt_t = std::codecvt<wchar_t, char, std::mbstate_t>;

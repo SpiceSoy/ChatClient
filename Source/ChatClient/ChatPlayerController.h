@@ -23,7 +23,5 @@ public:
 	virtual void PlayerTick(float deltaTime) override;
 private:
 	TWeakObjectPtr<class UChatWidget> ChatWidget = nullptr;
-	TUniquePtr<FChatConnection> ChatConnection;
-
-	void AddDelegates();
+	TWeakObjectPtr<class UChatConnection> ChatConnection = nullptr;
 };

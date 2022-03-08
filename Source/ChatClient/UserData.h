@@ -16,6 +16,7 @@ class CHATCLIENT_API UUserData : public UObject
 
 public:
 	UUserData();
+	virtual ~UUserData() = default;
 	void Set(const FString& name, const FString address);
 	const FString& GetName() const;
 	const FString& GetAddress() const;
