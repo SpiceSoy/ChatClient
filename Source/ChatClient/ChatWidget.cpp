@@ -73,23 +73,29 @@ void UChatWidget::NativeOnInitialized()
 
 void UChatWidget::OnTextChangedIpAddress(const FText& text)
 {
-	//FString newString = text.ToString();
-	//if (!newString.Right(0).IsNumeric())
-	//{
-	//	newString = newString.Mid(0, newString.Len() - 1);
-	//}
-	//TextBoxIp->SetText(FText::FromString(newString));
-	//UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::OnTextChangedIpAddress"));
+	FString newString = text.ToString();
+	if (newString.IsEmpty()) return;
+	FString lastInput = newString.Right(1);
+	TArray<TCHAR> scores = newString.GetCharArray().FilterByPredicate([](const CHAR a) {return a == TEXT('.'); });
+	bool lastInputIsIpElement = lastInput.IsNumeric() || lastInput[0] == TEXT('.');
+	bool dotCountIsValid = lastInput[0] != TEXT('.') || scores.Num() < 4;
+	if (!(lastInputIsIpElement && dotCountIsValid))
+	{
+		newString = newString.Mid(0, newString.Len() - 1);
+	}
+	TextBoxIp->SetText(FText::FromString(newString));
+	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::OnTextChangedIpAddress"));
 }
 
 void UChatWidget::OnTextChangedIpPort(const FText& text)
 {
-	//FString newString = text.ToString();
-	//if (!newString.IsNumeric())
-	//{
-	//	newString = newString.Mid(0, newString.Len() - 1);
-	//}
-	//TextBoxPort->SetText(FText::FromString(newString));
+	FString newString = text.ToString();
+	if(newString.IsEmpty()) return;
+	if (!newString.IsNumeric())
+	{
+		newString = newString.Mid(0, newString.Len() - 1);
+	}
+	TextBoxPort->SetText(FText::FromString(newString));
 }
 
 void UChatWidget::OnConnectBtnPressed()
