@@ -14,11 +14,17 @@ FChatConnection::FChatConnection()
 
 FChatConnection::~FChatConnection()
 {
+	Close();
 }
 
-FChatConnection::FReceivedLine& FChatConnection::GetReceivedLine()
+FChatConnection::FLineReceived& FChatConnection::GetLineReceived()
 {
-	return ReceivedLine;
+	return LineReceived;
+}
+
+FChatConnection::FClosedSession& FChatConnection::GetClosedSession()
+{
+	return ClosedSession;
 }
 
 bool FChatConnection::Connect(uint32 address, uint32 port)
@@ -32,6 +38,16 @@ bool FChatConnection::Connect(uint32 address, uint32 port)
 	IsConnected = Socket->Connect(*addr);
 	Socket->SetNonBlocking(true);
 	return IsConnected;
+}
+
+void FChatConnection::Close()
+{
+	if (IsConnected)
+	{
+		Socket->Close();
+		ClosedSession.Execute();
+		IsConnected = false;
+	}
 }
 
 void FChatConnection::Process()
@@ -56,7 +72,7 @@ void FChatConnection::ProcessRecv()
 	bool result = Socket->Recv(RecvBuffer.GetData(), RecvBuffer.Num() * RecvBuffer.GetTypeSize(), byteRecved);
 	if (result == false)
 	{
-		//俊矾贸府
+		Close();
 	}
 	else if (byteRecved != 0)
 	{
@@ -65,7 +81,7 @@ void FChatConnection::ProcessRecv()
 		if (RecvBuffer[RecvBytes - 1] == '\n')
 		{
 			RecvBuffer[RecvBytes - 1] = 0;
-			ReceivedLine.Execute(ConvertToWBCS(RecvBuffer.GetData(), RecvBytes));
+			LineReceived.Execute(ConvertToWBCS(RecvBuffer.GetData(), RecvBytes));
 			RecvBytes = 0;
 		}
 		UE_LOG(LogTemp, Log, TEXT("CALL FChatConnection::ProcessRecv"));
@@ -79,7 +95,7 @@ void FChatConnection::ProcessSend()
 	bool result = Socket->Send(SendBuffer.GetData(), SendBytes, byteSent);
 	if (result == false)
 	{
-		//俊矾贸府
+		Close();
 	}
 	else if (byteSent != 0)
 	{

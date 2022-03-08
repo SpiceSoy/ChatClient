@@ -40,7 +40,7 @@ void AChatPlayerController::PlayerTick(float deltaTime)
 void AChatPlayerController::AddDelegates()
 {
 	if (!ChatWidget.IsValid()) return;
-	//�ӽÿ�
+	//임시용
 
 	TWeakObjectPtr< AChatPlayerController > thisObjPtr(this);
 	ChatWidget->GetConnectBtnPressed().BindLambda(
@@ -59,11 +59,11 @@ void AChatPlayerController::AddDelegates()
 			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
 			if (connectionResult)
 			{
-				chatWidget->AppendLog(TEXT("Connection Successed!\n"));
+				chatWidget->AppendLog(TEXT("연결이 성공하였습니다.\n"));
 			}
 			else 
 			{
-				chatWidget->AppendLog(TEXT("Connection Failed!\n"));
+				chatWidget->AppendLog(TEXT("연결이 실패하였습니다.\n"));
 			}
 		}
 	);
@@ -78,7 +78,7 @@ void AChatPlayerController::AddDelegates()
 		}
 	);
 
-	ChatConnection->GetReceivedLine().BindLambda(
+	ChatConnection->GetLineReceived().BindLambda(
 		[thisObjPtr](const FString& text) {
 			if (!thisObjPtr.IsValid()) return;
 			AChatPlayerController* thisPtr = thisObjPtr.Get();
@@ -88,6 +88,15 @@ void AChatPlayerController::AddDelegates()
 		}
 	);
 
+	ChatConnection->GetClosedSession().BindLambda(
+		[thisObjPtr]() {
+			if (!thisObjPtr.IsValid()) return;
+			AChatPlayerController* thisPtr = thisObjPtr.Get();
+			if (!thisPtr->ChatWidget.IsValid()) return;
+			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
+			chatWidget->AppendLog(TEXT("연결이 종료되었습니다.\n"));
+		}
+	);
 
 }
 

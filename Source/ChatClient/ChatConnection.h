@@ -22,16 +22,17 @@
  */
 class CHATCLIENT_API FChatConnection
 {
-	DECLARE_DELEGATE_OneParam(FReceivedLine, const FString&);
+	DECLARE_DELEGATE_OneParam(FLineReceived, const FString&);
+	DECLARE_DELEGATE(FClosedSession);
 public:
 	FChatConnection();
 	~FChatConnection();
 
-	FReceivedLine ReceivedLine;
+	FLineReceived& GetLineReceived();
+	FClosedSession& GetClosedSession();
 
-
-	FReceivedLine& GetReceivedLine();
 	bool Connect(uint32 address, uint32 port);
+	void Close();
 	void Process();
 	void SendText(const FString& str);
 private:
@@ -43,6 +44,8 @@ private:
 	class FRunnableThread* RunRead = nullptr;
 	bool IsConnected = false;
 
+	FLineReceived LineReceived;
+	FClosedSession ClosedSession;
 private:
 	void ProcessRecv();
 	void ProcessSend();
