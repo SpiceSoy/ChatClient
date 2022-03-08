@@ -42,6 +42,9 @@ private:
 	class UEditableTextBox* TextBoxChat;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class URichTextBlock* TextBoxLog;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UScrollBox* ScrollBoxChat;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ConnectButton;

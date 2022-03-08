@@ -12,9 +12,10 @@
 #include "ChatWidget.h"
 #include "ChatPlayerController.h"
 #include "Networking.h"
+#include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/RichTextBlock.h"
-#include "Components/Button.h"
+#include "Components/ScrollBox.h"
 
 #define ID_TB_IPADDRESS "TB_IPAddress"
 #define ID_TB_PORT "TB_Port"
@@ -22,6 +23,7 @@
 #define ID_RTB_LOG "RTB_Log"
 #define ID_BTN_CONNECT "BTN_Connect"
 #define ID_BTN_SEND "BTN_Send"
+#define ID_SB_CHAT "SB_Chat"
 
 UChatWidget::FConnectBtnPressed& UChatWidget::GetConnectBtnPressed()
 {
@@ -38,7 +40,7 @@ void UChatWidget::AppendLog(const FString& str) const
 	FString newLog = TextBoxLog->GetText().ToString();
 	newLog += str;
 	TextBoxLog->SetText(FText::FromString(newLog));
-	//TextBoxLog->SCroll
+	ScrollBoxChat->ScrollToEnd();
 	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::AppendLog"));
 }
 
@@ -57,6 +59,7 @@ void UChatWidget::NativeOnInitialized()
 	TextBoxLog = Cast<URichTextBlock>(GetWidgetFromName(TEXT(ID_RTB_LOG)));
 	ConnectButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_CONNECT)));
 	SendButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_SEND)));
+	ScrollBoxChat = Cast<UScrollBox>(GetWidgetFromName(TEXT(ID_SB_CHAT)));
 
 	TextBoxIp->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpAddress);
 	TextBoxPort->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpPort);
