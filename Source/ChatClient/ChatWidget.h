@@ -13,9 +13,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Types/SlateEnums.h"
 #include "ChatWidget.generated.h"
-
-
 
 /**
  *
@@ -42,7 +41,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UEditableTextBox* TextBoxChat;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UMultiLineEditableTextBox* TextBoxLog;
+	class URichTextBlock* TextBoxLog;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ConnectButton;
@@ -64,4 +63,7 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void OnChatSendBtnPressed();
+
+	UFUNCTION()
+	void OnChatCommitted(const FText& text, ETextCommit::Type type);
 };

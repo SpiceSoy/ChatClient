@@ -10,15 +10,16 @@
 
 
 #include "ChatWidget.h"
+#include "ChatPlayerController.h"
 #include "Networking.h"
 #include "Components/EditableTextBox.h"
-#include "Components/MultiLineEditableTextBox.h"
+#include "Components/RichTextBlock.h"
 #include "Components/Button.h"
 
 #define ID_TB_IPADDRESS "TB_IPAddress"
 #define ID_TB_PORT "TB_Port"
 #define ID_TB_CHAT "TB_Chat"
-#define ID_MTB_LOG "MTB_Log"
+#define ID_RTB_LOG "RTB_Log"
 #define ID_BTN_CONNECT "BTN_Connect"
 #define ID_BTN_SEND "BTN_Send"
 
@@ -34,9 +35,10 @@ UChatWidget::FChatSendBtnPressed& UChatWidget::GetChatSendBtnPressed()
 
 void UChatWidget::AppendLog(const FString& str) const
 {
-	FString newLog = TextBoxLog->Text.ToString();
+	FString newLog = TextBoxLog->GetText().ToString();
 	newLog += str;
 	TextBoxLog->SetText(FText::FromString(newLog));
+	//TextBoxLog->SCroll
 	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::AppendLog"));
 }
 
@@ -52,12 +54,13 @@ void UChatWidget::NativeOnInitialized()
 	TextBoxIp = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_IPADDRESS)));
 	TextBoxPort = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_PORT)));
 	TextBoxChat = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_CHAT)));
-	TextBoxLog = Cast<UMultiLineEditableTextBox>(GetWidgetFromName(TEXT(ID_MTB_LOG)));
+	TextBoxLog = Cast<URichTextBlock>(GetWidgetFromName(TEXT(ID_RTB_LOG)));
 	ConnectButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_CONNECT)));
 	SendButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_SEND)));
 
 	TextBoxIp->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpAddress);
 	TextBoxPort->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpPort);
+	TextBoxChat->OnTextCommitted.AddDynamic(this, &UChatWidget::OnChatCommitted);
 	ConnectButton->OnClicked.AddDynamic(this, &UChatWidget::OnConnectBtnPressed);
 	SendButton->OnClicked.AddDynamic(this, &UChatWidget::OnChatSendBtnPressed);
 
@@ -113,5 +116,19 @@ void UChatWidget::OnChatSendBtnPressed()
 	if (str.Len() == 0) return;
 	ChatSendBtnPressed.Execute(str);
 	TextBoxChat->SetText(FText::GetEmpty());
+}
+
+void UChatWidget::OnChatCommitted(const FText& text, ETextCommit::Type type)
+{
+	if(type == ETextCommit::Type::OnEnter)
+	{
+		OnChatSendBtnPressed();
+		TextBoxChat->SetUserFocus(this->GetOwningPlayer<AChatPlayerController>());
+		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::SetKeyboardFocus"));
+	}
+	else if(type == ETextCommit::Type::OnCleared)
+	{
+		TextBoxChat->SetUserFocus(this->GetOwningPlayer<AChatPlayerController>());
+	}
 }
 
