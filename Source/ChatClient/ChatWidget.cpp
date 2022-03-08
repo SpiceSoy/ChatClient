@@ -9,21 +9,31 @@
 //=================================================================================================
 
 
-#include "ChatWidget.h"
 #include "ChatPlayerController.h"
+#include "ChatWidget.h"
+#include "CommandButton.h"
 #include "Networking.h"
+#include "UserData.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Components/ListView.h"
 #include "Components/RichTextBlock.h"
 #include "Components/ScrollBox.h"
+#include "Components/WrapBox.h"
 
-#define ID_TB_IPADDRESS "TB_IPAddress"
-#define ID_TB_PORT "TB_Port"
-#define ID_TB_CHAT "TB_Chat"
-#define ID_RTB_LOG "RTB_Log"
-#define ID_BTN_CONNECT "BTN_Connect"
-#define ID_BTN_SEND "BTN_Send"
-#define ID_SB_CHAT "SB_Chat"
+constexpr const TCHAR* ID_TB_IPADDRESS = TEXT("TB_IPAddress");
+constexpr const TCHAR* ID_TB_PORT = TEXT("TB_Port");
+constexpr const TCHAR* ID_TB_CHAT = TEXT("TB_Chat");
+constexpr const TCHAR* ID_RTB_LOG = TEXT("RTB_Log");
+constexpr const TCHAR* ID_BTN_CONNECT = TEXT("BTN_Connect");
+constexpr const TCHAR* ID_BTN_SEND = TEXT("BTN_Send");
+constexpr const TCHAR* ID_SB_CHAT = TEXT("SB_Chat");
+constexpr const TCHAR* ID_B_C_HELP = TEXT("B_C_Help");
+constexpr const TCHAR* ID_B_C_QUIT = TEXT("B_C_Quit");
+constexpr const TCHAR* ID_B_C_USERLIST = TEXT("B_C_UserList");
+constexpr const TCHAR* ID_B_C_ROOMLIST = TEXT("B_C_RoomList");
+constexpr const TCHAR* ID_WB_COMMAND = TEXT("WB_Command");
+constexpr const TCHAR* ID_LV_USER = TEXT("LV_User");
 
 UChatWidget::FConnectBtnPressed& UChatWidget::GetConnectBtnPressed()
 {
@@ -53,23 +63,107 @@ void UChatWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	TextBoxIp = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_IPADDRESS)));
-	TextBoxPort = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_PORT)));
-	TextBoxChat = Cast<UEditableTextBox>(GetWidgetFromName(TEXT(ID_TB_CHAT)));
-	TextBoxLog = Cast<URichTextBlock>(GetWidgetFromName(TEXT(ID_RTB_LOG)));
-	ConnectButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_CONNECT)));
-	SendButton = Cast<UButton>(GetWidgetFromName(TEXT(ID_BTN_SEND)));
-	ScrollBoxChat = Cast<UScrollBox>(GetWidgetFromName(TEXT(ID_SB_CHAT)));
-
+	TextBoxIp = Cast<UEditableTextBox>(GetWidgetFromName(ID_TB_IPADDRESS));
 	TextBoxIp->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpAddress);
+
+	TextBoxPort = Cast<UEditableTextBox>(GetWidgetFromName(ID_TB_PORT));
 	TextBoxPort->OnTextChanged.AddDynamic(this, &UChatWidget::OnTextChangedIpPort);
+
+	TextBoxChat = Cast<UEditableTextBox>(GetWidgetFromName(ID_TB_CHAT));
 	TextBoxChat->OnTextCommitted.AddDynamic(this, &UChatWidget::OnChatCommitted);
+
+	TextBoxLog = Cast<URichTextBlock>(GetWidgetFromName(ID_RTB_LOG));
+
+	ConnectButton = Cast<UButton>(GetWidgetFromName(ID_BTN_CONNECT));
 	ConnectButton->OnClicked.AddDynamic(this, &UChatWidget::OnConnectBtnPressed);
+
+	SendButton = Cast<UButton>(GetWidgetFromName(ID_BTN_SEND));
 	SendButton->OnClicked.AddDynamic(this, &UChatWidget::OnChatSendBtnPressed);
 
-	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::NativeOnInitialized"));
+	ScrollBoxChat = Cast<UScrollBox>(GetWidgetFromName(ID_SB_CHAT));
 
+	WrapBoxCommand = Cast<UWrapBox>(GetWidgetFromName(ID_WB_COMMAND));
+
+	ListViewUser = Cast<UListView>(GetWidgetFromName(ID_LV_USER));
+
+	
+	UUserData* userData = NewObject<UUserData>();
+	if(userData) 
+	{
+		userData->Set(TEXT("User0"), TEXT("127.0.0.1"));
+		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::userData CREATE SUC"));
+		users.Add(userData);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::userData CREATE FAIELD"));
+	}
+	ListViewUser->SetListItems(users);
+
+	TWeakObjectPtr< UChatWidget > thisObjPtr(this);
+	if (ClassCommandButton)
+	{
+		//명령어 안내
+		{
+			UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
+			if (button)
+			{
+				button->Set(TEXT("명령어 안내"),
+					[thisObjPtr]()
+					{
+						if (!thisObjPtr.IsValid()) return;
+						UChatWidget* chatWidget = thisObjPtr.Get();
+						FText tempText = chatWidget->TextBoxChat->GetText();
+						chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("H")));
+						chatWidget->OnChatSendBtnPressed();
+						chatWidget->TextBoxChat->SetText(tempText);
+					}
+				);
+				WrapBoxCommand->AddChild(button);
+			}
+		}
+		//유저 리스트
+		{
+			UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
+			if (button)
+			{
+				button->Set(TEXT("이용자 목록"),
+					[thisObjPtr]()
+					{
+						if (!thisObjPtr.IsValid()) return;
+						UChatWidget* chatWidget = thisObjPtr.Get();
+						FText tempText = chatWidget->TextBoxChat->GetText();
+						chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("US")));
+						chatWidget->OnChatSendBtnPressed();
+						chatWidget->TextBoxChat->SetText(tempText);
+					}
+				);
+				WrapBoxCommand->AddChild(button);
+			}
+		}
+	}
+
+	//대화방 리스트
+	{
+		UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
+		if (button)
+		{
+			button->Set(TEXT("대화방 목록"),
+				[thisObjPtr]()
+				{
+					if (!thisObjPtr.IsValid()) return;
+					UChatWidget* chatWidget = thisObjPtr.Get();
+					FText tempText = chatWidget->TextBoxChat->GetText();
+					chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("LT")));
+					chatWidget->OnChatSendBtnPressed();
+					chatWidget->TextBoxChat->SetText(tempText);
+				}
+			);
+			WrapBoxCommand->AddChild(button);
+		}
+	}
 }
+
 
 void UChatWidget::OnTextChangedIpAddress(const FText& text)
 {
@@ -90,7 +184,7 @@ void UChatWidget::OnTextChangedIpAddress(const FText& text)
 void UChatWidget::OnTextChangedIpPort(const FText& text)
 {
 	FString newString = text.ToString();
-	if(newString.IsEmpty()) return;
+	if (newString.IsEmpty()) return;
 	if (!newString.IsNumeric())
 	{
 		newString = newString.Mid(0, newString.Len() - 1);
@@ -112,7 +206,7 @@ void UChatWidget::OnConnectBtnPressed()
 		uint32 portNum = FCString::Atoi(*portString);
 		ConnectBtnPressed.Execute(address, portNum);
 	}
-	else 
+	else
 	{
 		AppendLog(TEXT("Address is Wrong\n"));
 	}
@@ -129,13 +223,13 @@ void UChatWidget::OnChatSendBtnPressed()
 
 void UChatWidget::OnChatCommitted(const FText& text, ETextCommit::Type type)
 {
-	if(type == ETextCommit::Type::OnEnter)
+	if (type == ETextCommit::Type::OnEnter)
 	{
 		OnChatSendBtnPressed();
 		TextBoxChat->SetUserFocus(this->GetOwningPlayer<AChatPlayerController>());
 		UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::SetKeyboardFocus"));
 	}
-	else if(type == ETextCommit::Type::OnCleared)
+	else if (type == ETextCommit::Type::OnCleared)
 	{
 		TextBoxChat->SetUserFocus(this->GetOwningPlayer<AChatPlayerController>());
 	}

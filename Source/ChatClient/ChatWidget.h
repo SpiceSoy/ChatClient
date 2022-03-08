@@ -33,6 +33,7 @@ public:
 	void AppendLog(const FText& text) const;
 protected:
 	virtual void NativeOnInitialized() override;
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UEditableTextBox* TextBoxIp;
@@ -45,12 +46,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UScrollBox* ScrollBoxChat;
 
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ConnectButton;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* SendButton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UWrapBox* WrapBoxCommand;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UListView* ListViewUser;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UCommandButton> ClassCommandButton;
 
 	FConnectBtnPressed ConnectBtnPressed;
 	FChatSendBtnPressed ChatSendBtnPressed;
@@ -69,4 +78,6 @@ private:
 
 	UFUNCTION()
 	void OnChatCommitted(const FText& text, ETextCommit::Type type);
+
+	TArray<class UUserData*> users;
 };

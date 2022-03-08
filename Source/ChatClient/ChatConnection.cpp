@@ -59,6 +59,7 @@ void FChatConnection::Process()
 
 void FChatConnection::SendText(const FString& str)
 {
+	if (!IsConnected) return;
 	if (GetSendBufferSize() < SendBytes + str.Len() * sizeof(WIDECHAR))
 	{
 		GrowSendBuffer();
