@@ -111,8 +111,7 @@ void UChatWidget::OnChatSendBtnPressed()
 	UE_LOG(LogTemp, Log, TEXT("CALL UChatWidget::OnChatSendBtnPressed"));
 	FString str = TextBoxChat->Text.ToString();
 	if (str.Len() == 0) return;
-	str += TEXT("\r\n");
 	ChatSendBtnPressed.Execute(str);
-	//TextBoxChat->SetText(FText::GetEmpty());
+	TextBoxChat->SetText(FText::GetEmpty());
 }
 
