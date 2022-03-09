@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ChatTab.generated.h"
+#include "ChatTemplate.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHATCLIENT_API UChatTab : public UUserWidget
+class CHATCLIENT_API UChatTemplate : public UUserWidget
 {
 	GENERATED_BODY()
 	
