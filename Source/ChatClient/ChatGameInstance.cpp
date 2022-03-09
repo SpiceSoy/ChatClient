@@ -3,25 +3,26 @@
 
 #include "ChatGameInstance.h"
 #include "ChatWidget.h"
+#include "ChatTemplate.h"
 #include "ChatConnection.h"
 #include "ChatPlayerController.h"
 
-TWeakObjectPtr<UChatWidget> UChatGameInstance::GetChatWidget() const
+TWeakObjectPtr<UChatTemplate> UChatGameInstance::GetChatWidget() const
 {
-	return MakeWeakObjectPtr<UChatWidget>(ChatWidget);
+	return MakeWeakObjectPtr<UChatTemplate>(ChatTemplate);
 }
 
-TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
-{
-	return MakeWeakObjectPtr<UChatConnection>(ChatConnection);
-}
+//TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
+//{
+//	return MakeWeakObjectPtr<UChatConnection>(ChatConnection);
+//}
 
 UChatGameInstance::UChatGameInstance()
 {
-	static ConstructorHelpers::FClassFinder<UChatWidget> chatWidgetClass(TEXT("/Game/UI/BPChatWidget"));
-	if (chatWidgetClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UChatTemplate> chatTemplateClass(TEXT("/Game/UI/BPChatTemplate"));
+	if (chatTemplateClass.Succeeded())
 	{
-		ChatWidgetClass = chatWidgetClass.Class;
+		ChatTemplateClass = chatTemplateClass.Class;
 		UE_LOG(LogTemp, Log, TEXT("CALL UChatGameInstance::ConstructorHelpers"));
 	}
 	else
@@ -37,17 +38,17 @@ UChatGameInstance::~UChatGameInstance()
 
 void UChatGameInstance::CreateChatWidget(AChatPlayerController* owner)
 {
-	if (ChatWidgetClass)
+	if (ChatTemplateClass)
 	{
-		ChatWidget = CreateWidget<UChatWidget>(owner, ChatWidgetClass, TEXT("ChatWidget"));
+		ChatTemplate = CreateWidget<UChatTemplate>(owner, ChatTemplateClass, TEXT("ChatWidget"));
 		UE_LOG(LogTemp, Log, TEXT("CALL UChatGameInstance::Init"));
 	}
 }
 
 void UChatGameInstance::CreateChatConnection()
 {
-	ChatConnection = NewObject<UChatConnection>();
-	if(ChatWidget) ChatConnection->SetWidget(MakeWeakObjectPtr(ChatWidget));
+	//ChatConnection = NewObject<UChatConnection>();
+	//if(ChatWidget) ChatConnection->SetWidget(MakeWeakObjectPtr(ChatWidget));
 }
 
 void UChatGameInstance::Init()

@@ -8,9 +8,6 @@
 #include "ChatGameInstance.generated.h"
 
 
-
-class UChatWidget;
-
 /**
  * 
  */
@@ -20,8 +17,8 @@ class CHATCLIENT_API UChatGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	TWeakObjectPtr<UChatWidget> GetChatWidget() const;
-	TWeakObjectPtr<class UChatConnection> GetChatConnection() const;
+	TWeakObjectPtr<class UChatTemplate> GetChatWidget() const;
+	//TWeakObjectPtr<class UChatConnection> GetChatConnection() const;
 	UChatGameInstance();
 	~UChatGameInstance();
 
@@ -30,10 +27,10 @@ public:
 protected:
 	virtual void Init() override;
 private:
-	TSubclassOf<class UChatWidget> ChatWidgetClass;
+	TSubclassOf<class UChatTemplate> ChatTemplateClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UChatWidget* ChatWidget = nullptr;
+	class UChatTemplate* ChatTemplate = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UChatConnection* ChatConnection = nullptr;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//class UChatConnection* ChatConnection = nullptr;
 };

@@ -5,6 +5,7 @@
 #include "ChatConnection.h"
 #include "ChatGameInstance.h"
 #include "ChatWidget.h"
+#include "ChatTemplate.h"
 
 AChatPlayerController::AChatPlayerController()
 {
@@ -22,11 +23,11 @@ void AChatPlayerController::BeginPlay()
 	UChatGameInstance* gameInstance = Cast<UChatGameInstance>(GetGameInstance());
 	gameInstance->CreateChatWidget(this);
 	gameInstance->CreateChatConnection();
-	ChatWidget = gameInstance->GetChatWidget();
-	ChatConnection = gameInstance->GetChatConnection();
-	if (ChatWidget.IsValid())
+	ChatTemplate = gameInstance->GetChatWidget();
+	//ChatConnection = gameInstance->GetChatConnection();
+	if (ChatTemplate.IsValid())
 	{
-		ChatWidget->AddToViewport();
+		ChatTemplate->AddToViewport();
 		SetShowMouseCursor(true);
 		SetInputMode(FInputModeUIOnly());
 	}
@@ -34,7 +35,7 @@ void AChatPlayerController::BeginPlay()
 
 void AChatPlayerController::PlayerTick(float deltaTime)
 {
-	if (ChatConnection.IsValid()) ChatConnection->Process();
+	//if (ChatConnection.IsValid()) ChatConnection->Process();
 }
 
 

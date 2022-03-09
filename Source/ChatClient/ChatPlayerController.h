@@ -22,6 +22,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void PlayerTick(float deltaTime) override;
 private:
-	TWeakObjectPtr<class UChatWidget> ChatWidget = nullptr;
+	TWeakObjectPtr<class UChatTemplate> ChatTemplate = nullptr;
 	TWeakObjectPtr<class UChatConnection> ChatConnection = nullptr;
 };
