@@ -24,7 +24,7 @@ void AChatPlayerController::BeginPlay()
 	gameInstance->CreateChatWidget(this);
 	gameInstance->CreateChatConnection();
 	ChatTemplate = gameInstance->GetChatWidget();
-	//ChatConnection = gameInstance->GetChatConnection();
+	ChatConnection = gameInstance->GetChatConnection();
 	if (ChatTemplate.IsValid())
 	{
 		ChatTemplate->AddToViewport();
@@ -35,7 +35,7 @@ void AChatPlayerController::BeginPlay()
 
 void AChatPlayerController::PlayerTick(float deltaTime)
 {
-	//if (ChatConnection.IsValid()) ChatConnection->Process();
+	if (ChatConnection.IsValid()) ChatConnection->Process();
 }
 
 

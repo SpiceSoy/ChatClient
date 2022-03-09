@@ -12,10 +12,10 @@ TWeakObjectPtr<UChatTemplate> UChatGameInstance::GetChatWidget() const
 	return MakeWeakObjectPtr<UChatTemplate>(ChatTemplate);
 }
 
-//TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
-//{
-//	return MakeWeakObjectPtr<UChatConnection>(ChatConnection);
-//}
+TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
+{
+	return MakeWeakObjectPtr<UChatConnection>(ChatConnection);
+}
 
 UChatGameInstance::UChatGameInstance()
 {
@@ -47,8 +47,8 @@ void UChatGameInstance::CreateChatWidget(AChatPlayerController* owner)
 
 void UChatGameInstance::CreateChatConnection()
 {
-	//ChatConnection = NewObject<UChatConnection>();
-	//if(ChatWidget) ChatConnection->SetWidget(MakeWeakObjectPtr(ChatWidget));
+	ChatConnection = NewObject<UChatConnection>();
+	if(ChatTemplate) ChatConnection->SetChatUi(MakeWeakObjectPtr(ChatTemplate));
 }
 
 void UChatGameInstance::Init()

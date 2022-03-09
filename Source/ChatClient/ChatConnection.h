@@ -20,8 +20,6 @@
 #include "ChatConnection.generated.h"
 
 
-class FCommandProcessor;
-class UChatWidget;
 /**
  * 
  */
@@ -40,7 +38,7 @@ public:
 	void Close();
 	void Process();
 	void SendText(const FString& str);
-	void SetWidget(const TWeakObjectPtr<UChatWidget>& ptr);
+	void SetChatUi(const TWeakObjectPtr<class UChatTemplate>& ptr);
 private:
 	TArray<uint8> RecvBuffer;
 	int32 RecvBytes = 0;
@@ -49,7 +47,8 @@ private:
 	class FSocket* Socket = nullptr;
 	class FRunnableThread* RunRead = nullptr;
 	bool IsConnected = false;
-	TWeakObjectPtr<UChatWidget> ChatWidget;
+	TWeakObjectPtr<UChatTemplate> ChatUi;
+	//TWeakObjectPtr<UChatWidget> ChatWidget;
 	FCommandProcessor CommandProcessor;
 
 	void OnSessionClosed();

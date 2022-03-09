@@ -3,6 +3,10 @@
 
 #include "ChatConnection.h"
 #include "ChatWidget.h"
+#include "ChatTemplate.h"
+#include "ChatPageWidget.h"
+#include "ConnectWidget.h"
+#include "UserListWidget.h"
 #include "Command/CommandProcessor.h"
 #include "Containers/StringConv.h"
 #include <codecvt>
@@ -64,43 +68,96 @@ void UChatConnection::SendText(const FString& str)
 	SendBytes += ConvertToMBCS(str, SendBuffer.GetData() + SendBytes, GetSendBufferSize() - SendBytes);
 }
 
-void UChatConnection::SetWidget(const TWeakObjectPtr<UChatWidget>& ptr)
+void UChatConnection::SetChatUi(const TWeakObjectPtr<UChatTemplate>& ptr)
 {
-	ChatWidget = ptr;
+	ChatUi = ptr;
 	BindDelegate();
 }
 
+//void UChatConnection::SetWidget(const TWeakObjectPtr<UChatWidget>& ptr)
+//{
+//	ChatWidget = ptr;
+//	BindDelegate();
+//}
+
 void UChatConnection::OnSessionClosed()
 {
-	if (ChatWidget.IsValid()) ChatWidget->AppendLog(TEXT("연결이 종료되었습니다.\n"));
+	//if (ChatWidget.IsValid()) ChatWidget->AppendLog(TEXT("연결이 종료되었습니다.\n"));
 }
 
 void UChatConnection::OnLineReceived(const FString& line)
 {
-	if (ChatWidget.IsValid()) ChatWidget->AppendLog(line);
+	if (!ChatUi.IsValid()) return;
+	TWeakObjectPtr<UChatPageWidget> lobby = ChatUi->GetLobbyWidget();
+	if (!lobby.IsValid()) return;
+	lobby->AppendLog(line);
 }
 
 void UChatConnection::BindDelegate()
 {
-	if (!ChatWidget.IsValid()) return;
+#pragma region WIDGET
+	//if (!ChatWidget.IsValid()) return;
 
+	//TWeakObjectPtr<UChatConnection> thisObjPtr = MakeWeakObjectPtr(this);
+
+	//ChatWidget->GetConnectBtnPressed().BindLambda(
+	//	[thisObjPtr](uint32 address, uint32 port)
+	//	{
+	//		if (!thisObjPtr.IsValid()) return;
+	//		UChatConnection* thisPtr = thisObjPtr.Get();
+	//		if (!thisPtr->ChatWidget.IsValid()) return;
+	//		UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
+
+	//		bool connectionResult = thisPtr->Connect(address, port);
+	//		if (connectionResult) chatWidget->AppendLog(TEXT("연결이 성공하였습니다.\n"));
+	//		else chatWidget->AppendLog(TEXT("연결이 실패하였습니다.\n"));
+	//	}
+	//);
+
+	//ChatWidget->GetChatSendBtnPressed().BindLambda(
+	//	[thisObjPtr](const FString& str)
+	//	{
+	//		if (!thisObjPtr.IsValid()) return;
+	//		UChatConnection* thisPtr = thisObjPtr.Get();
+	//		thisPtr->SendText(str);
+	//	}
+	//);
+
+	//CommandProcessor.GetChangedUserList().BindLambda(
+	//	[thisObjPtr](const TArray<UUserData*>& arr)
+	//	{
+	//		if (!thisObjPtr.IsValid()) return;
+	//		UChatConnection* thisPtr = thisObjPtr.Get();
+	//		if (!thisPtr->ChatWidget.IsValid()) return;
+	//		UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
+	//		chatWidget->SetUserList(arr);
+	//	}
+	//);
+#pragma endregion
+
+	if (!ChatUi.IsValid()) return;
 	TWeakObjectPtr<UChatConnection> thisObjPtr = MakeWeakObjectPtr(this);
+	TWeakObjectPtr<UChatTemplate> chatWidget = ChatUi;
+	TWeakObjectPtr<UConnectWidget> connectWidget = ChatUi->GetConnectWidget();
+	TWeakObjectPtr<UUserListWidget> userListWidget = ChatUi->GetUserListWidget();
+	TWeakObjectPtr<UChatPageWidget> lobbyWidget = ChatUi->GetLobbyWidget();
 
-	ChatWidget->GetConnectBtnPressed().BindLambda(
-		[thisObjPtr](uint32 address, uint32 port)
+	if (!chatWidget.IsValid()) return;
+	if (!connectWidget.IsValid()) return;
+	if (!userListWidget.IsValid()) return;
+	if (!lobbyWidget.IsValid()) return;
+
+
+	chatWidget->GetChagedTabUserList().BindLambda(
+		[thisObjPtr]()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
-			if (!thisPtr->ChatWidget.IsValid()) return;
-			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
-
-			bool connectionResult = thisPtr->Connect(address, port);
-			if (connectionResult) chatWidget->AppendLog(TEXT("연결이 성공하였습니다.\n"));
-			else chatWidget->AppendLog(TEXT("연결이 실패하였습니다.\n"));
+			thisPtr->SendText("US");
 		}
 	);
 
-	ChatWidget->GetChatSendBtnPressed().BindLambda(
+	lobbyWidget->GetClickedSend().BindLambda(
 		[thisObjPtr](const FString& str)
 		{
 			if (!thisObjPtr.IsValid()) return;
@@ -109,16 +166,53 @@ void UChatConnection::BindDelegate()
 		}
 	);
 
+	connectWidget->GetClickedConnectBtn().BindLambda(
+		[thisObjPtr, connectWidget](uint32 address, uint32 port)
+		{
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_START"));
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!connectWidget.IsValid()) return;
+			UConnectWidget* chatWidget = connectWidget.Get();
+
+
+			bool connectionResult = thisPtr->Connect(address, port);
+			if (connectionResult) chatWidget->SetConnectionInfoText(TEXT("연결이 성공하였습니다.\n"));
+			else chatWidget->SetConnectionInfoText(TEXT("연결이 실패하였습니다.\n"));
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
+		}
+	);
+
+	connectWidget->GetClickedLoginBtn().BindLambda(
+		[thisObjPtr, connectWidget, chatWidget](const FString& name)
+		{
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_START"));
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!connectWidget.IsValid()) return;
+			UConnectWidget* connectWidgetPtr = connectWidget.Get();
+			if (!chatWidget.IsValid()) return;
+			UChatTemplate* chatWidgetPtr = chatWidget.Get();
+
+			FString idCommand = FString::Printf(TEXT("LOGIN %s"), *name);
+			thisPtr->SendText(idCommand);
+			chatWidgetPtr->SetWidgetIndex(1);
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
+		}
+	);
+
 	CommandProcessor.GetChangedUserList().BindLambda(
-		[thisObjPtr](const TArray<UUserData*>& arr)
+		[thisObjPtr, userListWidget](const TArray<UUserData*>& arr)
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
-			if (!thisPtr->ChatWidget.IsValid()) return;
-			UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
-			chatWidget->SetUserList(arr);
+			if (!userListWidget.IsValid()) return;
+			UUserListWidget* userListWidgetPtr = userListWidget.Get();
+			userListWidgetPtr->SetUserList(arr);
 		}
 	);
+
+
 }
 
 void UChatConnection::ProcessRecv()
