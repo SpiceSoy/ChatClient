@@ -4,6 +4,7 @@
 #include "RoomListItemInternal.h"
 #include "RoomData.h"
 #include "ChatConnection.h"
+#include "ChatTemplate.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 
@@ -46,6 +47,7 @@ void URoomListItemInternal::OnClickedViewButton()
 	TWeakObjectPtr<UChatConnection> connection = RoomData->GetConnection();
 	if (!connection.IsValid()) return;
 	connection->SendCommand(FString::Printf(TEXT("ST %d"), RoomData->GetIndex()));
+	RoomData->GetChatUi()->OnClickedTabLobby();
 }
 
 void URoomListItemInternal::OnClickedEnterButton()
@@ -54,6 +56,7 @@ void URoomListItemInternal::OnClickedEnterButton()
 	TWeakObjectPtr<UChatConnection> connection = RoomData->GetConnection();
 	if (!connection.IsValid()) return;
 	connection->SendCommand(FString::Printf(TEXT("J %d"), RoomData->GetIndex()));
+	RoomData->GetChatUi()->OnClickedTabLobby();
 }
 
 void URoomListItemInternal::OnDataChanged()

@@ -94,65 +94,10 @@ void UChatWidget::NativeOnInitialized()
 	TWeakObjectPtr< UChatWidget > thisObjPtr(this);
 	if (ClassCommandButton)
 	{
-		//명령어 안내
-		{
-			UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
-			if (button)
-			{
-				button->Set(TEXT("명령어 안내"),
-					[thisObjPtr]()
-					{
-						if (!thisObjPtr.IsValid()) return;
-						UChatWidget* chatWidget = thisObjPtr.Get();
-						FText tempText = chatWidget->TextBoxChat->GetText();
-						chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("H")));
-						chatWidget->OnChatSendBtnPressed();
-						chatWidget->TextBoxChat->SetText(tempText);
-					}
-				);
-				WrapBoxCommand->AddChild(button);
-			}
-		}
-		//유저 리스트
-		{
-			UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
-			if (button)
-			{
-				button->Set(TEXT("이용자 목록"),
-					[thisObjPtr]()
-					{
-						if (!thisObjPtr.IsValid()) return;
-						UChatWidget* chatWidget = thisObjPtr.Get();
-						FText tempText = chatWidget->TextBoxChat->GetText();
-						chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("US")));
-						chatWidget->OnChatSendBtnPressed();
-						chatWidget->TextBoxChat->SetText(tempText);
-					}
-				);
-				WrapBoxCommand->AddChild(button);
-			}
-		}
+
 	}
 
-	//대화방 리스트
-	{
-		UCommandButton* button = CreateWidget<UCommandButton>(this->GetOwningPlayer(), ClassCommandButton);
-		if (button)
-		{
-			button->Set(TEXT("대화방 목록"),
-				[thisObjPtr]()
-				{
-					if (!thisObjPtr.IsValid()) return;
-					UChatWidget* chatWidget = thisObjPtr.Get();
-					FText tempText = chatWidget->TextBoxChat->GetText();
-					chatWidget->TextBoxChat->SetText(FText::FromString(TEXT("LT")));
-					chatWidget->OnChatSendBtnPressed();
-					chatWidget->TextBoxChat->SetText(tempText);
-				}
-			);
-			WrapBoxCommand->AddChild(button);
-		}
-	}
+
 }
 
 

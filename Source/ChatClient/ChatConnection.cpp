@@ -91,6 +91,7 @@ void UChatConnection::OnSessionClosed()
 	TWeakObjectPtr<UConnectWidget> connectWidget = ChatUi->GetConnectWidget();
 	if(!connectWidget.IsValid()) return;
 	connectWidget->SetConnectionInfoText(TEXT("연결이 종료되었습니다."));
+	CommandProcessor.TurnOnLoginState();
 	IsConnected = false;
 	IsLogin = false;
 }
@@ -199,25 +200,28 @@ void UChatConnection::BindDelegate()
 	);
 
 	CommandProcessor.GetChangedUserList().BindLambda(
-		[thisObjPtr, userListWidget](const TArray<UUserData*>& arr)
+		[thisObjPtr, userListWidget, chatWidget](const TArray<UUserData*>& arr)
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
 			if (!userListWidget.IsValid()) return;
 			UUserListWidget* userListWidgetPtr = userListWidget.Get();
+
+			for (UUserData* data : arr) data->SetPtr(thisObjPtr, chatWidget);
+
 			userListWidgetPtr->SetUserList(arr);
 		}
 	);
 
 	CommandProcessor.GetChangedRoomList().BindLambda(
-		[thisObjPtr, roomListWidget](const TArray<URoomData*>& arr)
+		[thisObjPtr, roomListWidget, chatWidget](const TArray<URoomData*>& arr)
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
 			if (!roomListWidget.IsValid()) return;
 			URoomListWidget* roomListWidgetPtr = roomListWidget.Get();
 
-			for (URoomData* data : arr) data->SetConnection(thisObjPtr);
+			for (URoomData* data : arr) data->SetPtr(thisObjPtr, chatWidget);
 
 			roomListWidgetPtr->SetRoomList(arr);
 		}
@@ -244,7 +248,7 @@ void UChatConnection::BindDelegate()
 	);
 
 	CommandProcessor.GetEnteredRoom().BindLambda(
-		[thisObjPtr, chatWidget]()
+		[thisObjPtr, chatWidget, lobbyWidget]()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
@@ -253,15 +257,24 @@ void UChatConnection::BindDelegate()
 			if (!chatWidget.IsValid()) return;
 			UChatTemplate* chatWidgetPtr = chatWidget.Get();
 			chatWidgetPtr->OnClickedTabLobby();
+
+			if (!lobbyWidget.IsValid()) return;
+			UChatPageWidget* lobbyWidgetPtr = lobbyWidget.Get();
+			lobbyWidgetPtr->SetChatRoom(true);
 		}
 	);
 
 	CommandProcessor.GetExitedRoom().BindLambda(
-		[thisObjPtr]()
+		[thisObjPtr, lobbyWidget]()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
 			thisPtr->IsInRoom = false;
+
+			if (!lobbyWidget.IsValid()) return;
+			UChatPageWidget* lobbyWidgetPtr = lobbyWidget.Get();
+			lobbyWidgetPtr->SetChatRoom(false);
+
 		}
 	);
 

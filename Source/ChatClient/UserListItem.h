@@ -17,9 +17,28 @@ class CHATCLIENT_API UUserListItem : public UUserWidget, public IUserObjectListE
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UTextBlock* Title;
+	class UTextBlock* TextBlockUserName = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UButton* ButtonView = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UButton* ButtonWhisper = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UButton* ButtonInvite = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UUserData* UserData = nullptr;
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool isSelected) override;
+private:
+	UFUNCTION()
+	void OnClickedButtonView();
+	UFUNCTION()
+	void OnClickedButtonWhisper();
+	UFUNCTION()
+	void OnClickedButtonInvite();
 };
