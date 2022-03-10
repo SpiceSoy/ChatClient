@@ -17,16 +17,16 @@
 UUserData::UUserData()
 	: UObject()
 {
-	Set(ERROR_NAME, ERROR_ADDR);
+	Set( ERROR_NAME, ERROR_ADDR );
 }
 
-void UUserData::Set(const FString& name, const FString address)
+void UUserData::Set( const FString& name, const FString address )
 {
 	Name = name;
 	Address = address;
 }
 
-void UUserData::SetPtr(const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi)
+void UUserData::SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi )
 {
 	Connection = connection;
 	ChatUi = chatUi;

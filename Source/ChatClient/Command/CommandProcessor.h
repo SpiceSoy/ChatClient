@@ -17,16 +17,16 @@
 
 
 /**
- * 
+ *
  */
 class CHATCLIENT_API FCommandProcessor
 {
-	DECLARE_DELEGATE_OneParam(FChangedUserList, const TArray<UUserData*>&);
-	DECLARE_DELEGATE_OneParam(FChangedRoomList, const TArray<URoomData*>&);
-	DECLARE_DELEGATE(FSucceededLogin);
-	DECLARE_DELEGATE_OneParam(FFailedLogin, const FString&);
-	DECLARE_DELEGATE(FEnteredRoom);
-	DECLARE_DELEGATE(FExitedRoom);
+	DECLARE_DELEGATE_OneParam( FChangedUserList, const TArray<UUserData*>& );
+	DECLARE_DELEGATE_OneParam( FChangedRoomList, const TArray<URoomData*>& );
+	DECLARE_DELEGATE( FSucceededLogin );
+	DECLARE_DELEGATE_OneParam( FFailedLogin, const FString& );
+	DECLARE_DELEGATE( FEnteredRoom );
+	DECLARE_DELEGATE( FExitedRoom );
 private:
 	FChangedUserList ChangedUserList;
 	FChangedRoomList ChangedRoomList;
@@ -44,20 +44,20 @@ private:
 	bool IsLoginState = true;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	TArray<UUserData*> UserDataPool;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	TArray<UUserData*> UserDatas;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	TArray<URoomData*> RoomDataPool;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	TArray<URoomData*> RoomDatas;
 public:
 	FCommandProcessor();
-	FCommandProcessor(const FCommandProcessor&) = delete;
+	FCommandProcessor( const FCommandProcessor& ) = delete;
 	~FCommandProcessor();
 
-	FCommandProcessor& operator=(const FCommandProcessor&) = delete;
+	FCommandProcessor& operator=( const FCommandProcessor& ) = delete;
 
 	FChangedUserList& GetChangedUserList();
 	FChangedRoomList& GetChangedRoomList();
@@ -66,18 +66,18 @@ public:
 	FEnteredRoom& GetEnteredRoom();
 	FExitedRoom& GetExitedRoom();
 
-	bool ProcessLine(const FString& line);
+	bool ProcessLine( const FString& line );
 
 	void PostStartChangedOfUserData();
-	void AddUserList(const FString& name, const FString& addr);
+	void AddUserList( const FString& name, const FString& addr );
 	void PostCompleteChangedOfUserData();
 
 	void PostStartChangedOfRoomData();
-	void AddRoomList(int32 index, const FString& title, int32 current, int32 max);
+	void AddRoomList( int32 index, const FString& title, int32 current, int32 max );
 	void PostCompleteChangedOfRoomData();
 
 	void PostLoginComplete();
-	void PostLoginFailed(const FString& info);
+	void PostLoginFailed( const FString& info );
 
 	void PostEnteredRoom();
 	void PostExitedRoom();

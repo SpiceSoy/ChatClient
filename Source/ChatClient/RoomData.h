@@ -16,13 +16,13 @@
 
 
 /**
- * 
+ *
  */
 UCLASS()
 class CHATCLIENT_API URoomData : public UObject
 {
 	GENERATED_BODY()
-	DECLARE_DELEGATE(FChangedData);
+	DECLARE_DELEGATE( FChangedData );
 private:
 	int32 Index;
 	int32 CurrentUserCount;
@@ -32,13 +32,13 @@ private:
 	TWeakObjectPtr<class UChatTemplate> ChatUi;
 	FChangedData ChangedData;
 	constexpr static int32 ERROR_NUM = 9393939393;
-	constexpr static FString ERROR_TITLE = TEXT("ERROR_ROOM");
+	constexpr static FString ERROR_TITLE = TEXT( "ERROR_ROOM" );
 public:
 	URoomData();
 	virtual ~URoomData() = default;
 
-	void Set(int32 index, const FString& title, int32 currentUserCount, int32 maxUserCount);
-	void SetPtr(const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi);
+	void Set( int32 index, const FString& title, int32 currentUserCount, int32 maxUserCount );
+	void SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi );
 
 	const FString& GetTitle() const;
 	int32 GetIndex() const;

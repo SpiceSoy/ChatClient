@@ -21,13 +21,13 @@
 
 
 /**
- * 
+ *
  */
- UCLASS()
+UCLASS()
 class CHATCLIENT_API UChatConnection : public UObject
 {
 
-	 GENERATED_BODY()
+	GENERATED_BODY()
 private:
 	TArray<uint8> RecvBuffer;
 	int32 RecvBytes = 0;
@@ -40,7 +40,7 @@ private:
 	bool IsLogin = false;
 	bool IsInRoom = false;
 
-	TWeakObjectPtr<UChatTemplate> ChatUi;
+	TWeakObjectPtr<class UChatTemplate> ChatUi;
 	FCommandProcessor CommandProcessor;
 	FString Name;
 public:
@@ -48,19 +48,19 @@ public:
 	~UChatConnection();
 	FCommandProcessor& GetCommandProcessor();
 
-	bool Connect(uint32 address, uint32 port);
+	bool Connect( uint32 address, uint32 port );
 	void Close();
 	void Process();
-	void SendText(const FString& str);
-	void SendCommand(const FString& str);
-	void SetChatUi(const TWeakObjectPtr<class UChatTemplate>& ptr);
+	void SendText( const FString& str );
+	void SendCommand( const FString& str );
+	void SetChatUi( const TWeakObjectPtr<class UChatTemplate>& ptr );
 
 	void OnSessionClosed();
-	void OnLineReceived(const FString& line);
+	void OnLineReceived( const FString& line );
 	void BindDelegate();
 
 	bool GetLogin() const;
-	void SetLogin(bool isLogin);
+	void SetLogin( bool isLogin );
 
 private:
 	void ProcessRecv();
@@ -71,6 +71,6 @@ private:
 	int32 GetRecvBufferSize() const;
 	int32 GetSendBufferSize() const;
 
-	static FString ConvertToWBCS(uint8* srcBuffer, uint32 size);
-	static uint32 ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size);
+	static FString ConvertToWBCS( uint8* srcBuffer, uint32 size );
+	static uint32 ConvertToMBCS( const FString& srcStr, uint8* destBuffer, uint32 size );
 };

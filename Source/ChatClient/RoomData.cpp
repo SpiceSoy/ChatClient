@@ -16,10 +16,10 @@
 URoomData::URoomData()
 	: UObject()
 {
-	Set(ERROR_NUM, ERROR_TITLE, ERROR_NUM, ERROR_NUM);
+	Set( ERROR_NUM, ERROR_TITLE, ERROR_NUM, ERROR_NUM );
 }
 
-void URoomData::Set(int32 index, const FString& title, int32 currnet, int32 max)
+void URoomData::Set( int32 index, const FString& title, int32 currnet, int32 max )
 {
 	Index = index;
 	Title = title;
@@ -28,7 +28,7 @@ void URoomData::Set(int32 index, const FString& title, int32 currnet, int32 max)
 	ChangedData.ExecuteIfBound();
 }
 
-void URoomData::SetPtr(const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatTemplate>& chatUi)
+void URoomData::SetPtr( const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatTemplate>& chatUi )
 {
 	Connection = connection;
 	ChatUi = chatUi;
@@ -47,7 +47,7 @@ int32 URoomData::GetIndex() const
 int32 URoomData::GetCurrentUserCount() const
 {
 	return CurrentUserCount;
-}	
+}
 
 int32 URoomData::GetMaxUserCount() const
 {

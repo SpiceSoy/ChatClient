@@ -18,7 +18,7 @@
 class CHATCLIENT_API CommandUserList : public BaseCommand
 {
 public:
-	CommandUserList(FCommandProcessor& processor);
+	CommandUserList( FCommandProcessor& processor );
 
-	virtual ECommandStatus ProcessCommand(const FString& line) override;
+	virtual ECommandStatus ProcessCommand( const FString& line ) override;
 };

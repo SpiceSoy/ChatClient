@@ -16,7 +16,7 @@
 
 
 /**
- * 
+ *
  */
 UCLASS()
 class CHATCLIENT_API UUserData : public UObject
@@ -28,14 +28,14 @@ private:
 	FString Address;
 	TWeakObjectPtr<UChatConnection> Connection;
 	TWeakObjectPtr<UChatTemplate> ChatUi;
-	constexpr static FString ERROR_ADDR = TEXT("ERR.ERR.ERR.ERR");
-	constexpr static FString ERROR_NAME = TEXT("ERROR_NAME");
+	constexpr static FString ERROR_ADDR = TEXT( "ERR.ERR.ERR.ERR" );
+	constexpr static FString ERROR_NAME = TEXT( "ERROR_NAME" );
 public:
 	UUserData();
 	virtual ~UUserData() = default;
 
-	void Set(const FString& name, const FString address);
-	void SetPtr(const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatTemplate>& chatUi);
+	void Set( const FString& name, const FString address );
+	void SetPtr( const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatTemplate>& chatUi );
 	const FString& GetName() const;
 	const FString& GetAddress() const;
 	const TWeakObjectPtr<class UChatConnection>& GetConnection() const;

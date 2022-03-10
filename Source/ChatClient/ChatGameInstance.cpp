@@ -17,25 +17,25 @@
 
 TWeakObjectPtr<UChatTemplate> UChatGameInstance::GetChatWidget() const
 {
-	return MakeWeakObjectPtr<UChatTemplate>(ChatTemplate);
+	return MakeWeakObjectPtr<UChatTemplate>( ChatTemplate );
 }
 
 TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
 {
-	return MakeWeakObjectPtr<UChatConnection>(ChatConnection);
+	return MakeWeakObjectPtr<UChatConnection>( ChatConnection );
 }
 
 UChatGameInstance::UChatGameInstance()
 {
-	static ConstructorHelpers::FClassFinder<UChatTemplate> chatTemplateClass(TEXT("/Game/UI/BPChatTemplate"));
-	if (chatTemplateClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UChatTemplate> chatTemplateClass( TEXT( "/Game/UI/BPChatTemplate" ) );
+	if( chatTemplateClass.Succeeded() )
 	{
 		ChatTemplateClass = chatTemplateClass.Class;
-		UE_LOG(LogTemp, Log, TEXT("CALL UChatGameInstance::ConstructorHelpers"));
+		UE_LOG( LogTemp, Log, TEXT( "CALL UChatGameInstance::ConstructorHelpers" ) );
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("CALL UChatGameInstance::ConstructorHelpers FAILED"));
+		UE_LOG( LogTemp, Log, TEXT( "CALL UChatGameInstance::ConstructorHelpers FAILED" ) );
 	}
 }
 
@@ -44,19 +44,19 @@ UChatGameInstance::~UChatGameInstance()
 
 }
 
-void UChatGameInstance::CreateChatWidget(AChatPlayerController* owner)
+void UChatGameInstance::CreateChatWidget( AChatPlayerController* owner )
 {
-	if (ChatTemplateClass)
+	if( ChatTemplateClass )
 	{
-		ChatTemplate = CreateWidget<UChatTemplate>(owner, ChatTemplateClass, TEXT("ChatWidget"));
-		UE_LOG(LogTemp, Log, TEXT("CALL UChatGameInstance::Init"));
+		ChatTemplate = CreateWidget<UChatTemplate>( owner, ChatTemplateClass, TEXT( "ChatWidget" ) );
+		UE_LOG( LogTemp, Log, TEXT( "CALL UChatGameInstance::Init" ) );
 	}
 }
 
 void UChatGameInstance::CreateChatConnection()
 {
 	ChatConnection = NewObject<UChatConnection>();
-	if(ChatTemplate) ChatConnection->SetChatUi(MakeWeakObjectPtr(ChatTemplate));
+	if( ChatTemplate ) ChatConnection->SetChatUi( MakeWeakObjectPtr( ChatTemplate ) );
 }
 
 void UChatGameInstance::Init()

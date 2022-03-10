@@ -18,7 +18,7 @@
 class CHATCLIENT_API CommandQuitRoom : public BaseCommand
 {
 public:
-	CommandQuitRoom(FCommandProcessor& processor);
+	CommandQuitRoom( FCommandProcessor& processor );
 
-	virtual ECommandStatus ProcessCommand(const FString& line) override;
+	virtual ECommandStatus ProcessCommand( const FString& line ) override;
 };

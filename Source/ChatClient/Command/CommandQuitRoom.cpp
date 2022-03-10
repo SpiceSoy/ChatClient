@@ -13,19 +13,19 @@
 #include "Command/CommandProcessor.h"
 
 
-CommandQuitRoom::CommandQuitRoom(FCommandProcessor& processor)
-	: BaseCommand(processor)
+CommandQuitRoom::CommandQuitRoom( FCommandProcessor& processor )
+	: BaseCommand( processor )
 {
 
 }
 
-ECommandStatus CommandQuitRoom::ProcessCommand(const FString& line)
+ECommandStatus CommandQuitRoom::ProcessCommand( const FString& line )
 {
-	bool isStartLine = IsLineToken(line);
-	if(line.StartsWith("**"))
+	bool isStartLine = IsLineToken( line );
+	if( line.StartsWith( "**" ) )
 	{
-		FString message = line.Mid(2).TrimStartAndEnd();
-		if( message.StartsWith(TEXT("대화방에서 나갑니다.")))
+		FString message = line.Mid( 2 ).TrimStartAndEnd();
+		if( message.StartsWith( TEXT( "대화방에서 나갑니다." ) ) )
 		{
 			Processor.PostExitedRoom();
 			return ECommandStatus::End;

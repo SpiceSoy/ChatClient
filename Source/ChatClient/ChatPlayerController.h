@@ -17,7 +17,7 @@
 
 
 /**
- * 
+ *
  */
 UCLASS()
 class CHATCLIENT_API AChatPlayerController : public APlayerController
@@ -32,5 +32,5 @@ public:
 	~AChatPlayerController();
 
 	virtual void BeginPlay() override;
-	virtual void PlayerTick(float deltaTime) override;
+	virtual void PlayerTick( float deltaTime ) override;
 };

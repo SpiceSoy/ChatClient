@@ -28,14 +28,14 @@ class CHATCLIENT_API BaseCommand
 protected:
 	class FCommandProcessor& Processor;
 public:
-	BaseCommand(FCommandProcessor& processor);
+	BaseCommand( FCommandProcessor& processor );
 	virtual ~BaseCommand() = default;
 
-	BaseCommand(const BaseCommand&) = delete;
-	BaseCommand& operator=(const BaseCommand&) = delete;
+	BaseCommand( const BaseCommand& ) = delete;
+	BaseCommand& operator=( const BaseCommand& ) = delete;
 
-	virtual ECommandStatus ProcessCommand(const FString& line) = 0;
+	virtual ECommandStatus ProcessCommand( const FString& line ) = 0;
 protected:
-	static bool IsLineToken(const FString& targetLine);
-	static bool IsSameTitle(const FString& targetLine, const FString& predTitle);
+	static bool IsLineToken( const FString& targetLine );
+	static bool IsSameTitle( const FString& targetLine, const FString& predTitle );
 };

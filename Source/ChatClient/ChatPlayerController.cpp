@@ -27,22 +27,22 @@ AChatPlayerController::~AChatPlayerController()
 void AChatPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	UChatGameInstance* gameInstance = Cast<UChatGameInstance>(GetGameInstance());
-	gameInstance->CreateChatWidget(this);
+	UChatGameInstance* gameInstance = Cast<UChatGameInstance>( GetGameInstance() );
+	gameInstance->CreateChatWidget( this );
 	gameInstance->CreateChatConnection();
 	ChatTemplate = gameInstance->GetChatWidget();
 	ChatConnection = gameInstance->GetChatConnection();
-	if (ChatTemplate.IsValid())
+	if( ChatTemplate.IsValid() )
 	{
 		ChatTemplate->AddToViewport();
-		SetShowMouseCursor(true);
-		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor( true );
+		SetInputMode( FInputModeUIOnly() );
 	}
 }
 
-void AChatPlayerController::PlayerTick(float deltaTime)
+void AChatPlayerController::PlayerTick( float deltaTime )
 {
-	if (ChatConnection.IsValid()) ChatConnection->Process();
+	if( ChatConnection.IsValid() ) ChatConnection->Process();
 }
 
 

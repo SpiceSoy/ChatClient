@@ -13,20 +13,20 @@
 #include "Command/CommandProcessor.h"
 
 
-CommandUserList::CommandUserList(FCommandProcessor& processor)
-	: BaseCommand(processor)
+CommandUserList::CommandUserList( FCommandProcessor& processor )
+	: BaseCommand( processor )
 {
 
 }
 
-ECommandStatus CommandUserList::ProcessCommand(const FString& line)
+ECommandStatus CommandUserList::ProcessCommand( const FString& line )
 {
 	static bool isCurrentSet = false;
 	static TArray<FString> tokens;
-	bool isStartLine = IsLineToken(line);
-	if(isCurrentSet)
+	bool isStartLine = IsLineToken( line );
+	if( isCurrentSet )
 	{
-		if(isStartLine)
+		if( isStartLine )
 		{
 			isCurrentSet = false;
 			Processor.PostCompleteChangedOfUserData();
@@ -35,14 +35,14 @@ ECommandStatus CommandUserList::ProcessCommand(const FString& line)
 		else
 		{
 			tokens.Empty();
-			const TCHAR* a = TEXT(" ");
-			line.ParseIntoArray(tokens, &a, 1);
-			Processor.AddUserList(tokens[1], tokens[3]);
+			const TCHAR* a = TEXT( " " );
+			line.ParseIntoArray( tokens, &a, 1 );
+			Processor.AddUserList( tokens[ 1 ], tokens[ 3 ] );
 		}
 	}
-	else if(isStartLine)
+	else if( isStartLine )
 	{
-		if(IsSameTitle(line, TEXT("이용자 목록")))
+		if( IsSameTitle( line, TEXT( "이용자 목록" ) ) )
 		{
 			isCurrentSet = true;
 			Processor.PostStartChangedOfUserData();

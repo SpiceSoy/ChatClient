@@ -17,7 +17,7 @@
 
 
 /**
- * 
+ *
  */
 UCLASS()
 class CHATCLIENT_API UChatGameInstance : public UGameInstance
@@ -30,15 +30,15 @@ public:
 	UChatGameInstance();
 	~UChatGameInstance();
 
-	void CreateChatWidget(class AChatPlayerController* owner);
+	void CreateChatWidget( class AChatPlayerController* owner );
 	void CreateChatConnection();
 protected:
 	virtual void Init() override;
 private:
 	TSubclassOf<class UChatTemplate> ChatTemplateClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	class UChatTemplate* ChatTemplate = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	class UChatConnection* ChatConnection = nullptr;
 };

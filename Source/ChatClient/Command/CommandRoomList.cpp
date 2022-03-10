@@ -13,19 +13,19 @@
 #include "Command/CommandProcessor.h"
 
 
-CommandRoomList::CommandRoomList(FCommandProcessor& processor)
-	: BaseCommand(processor)
+CommandRoomList::CommandRoomList( FCommandProcessor& processor )
+	: BaseCommand( processor )
 {
 
 }
 
-ECommandStatus CommandRoomList::ProcessCommand(const FString& line)
+ECommandStatus CommandRoomList::ProcessCommand( const FString& line )
 {
 	static bool isCurrentSet = false;
-	bool isStartLine = IsLineToken(line);
-	if (isCurrentSet)
+	bool isStartLine = IsLineToken( line );
+	if( isCurrentSet )
 	{
-		if (isStartLine)
+		if( isStartLine )
 		{
 			isCurrentSet = false;
 			Processor.PostCompleteChangedOfRoomData();
@@ -37,14 +37,14 @@ ECommandStatus CommandRoomList::ProcessCommand(const FString& line)
 			int32 currentUser = 0;
 			int32 maxUser = 0;
 			FString title;
-			ParseRoomData(line, index, currentUser, maxUser, title);
+			ParseRoomData( line, index, currentUser, maxUser, title );
 
-			Processor.AddRoomList(index, title, currentUser, maxUser);
+			Processor.AddRoomList( index, title, currentUser, maxUser );
 		}
 	}
-	else if (isStartLine)
+	else if( isStartLine )
 	{
-		if (IsSameTitle(line, TEXT("대화방 목록")))
+		if( IsSameTitle( line, TEXT( "대화방 목록" ) ) )
 		{
 			isCurrentSet = true;
 			Processor.PostStartChangedOfRoomData();
@@ -55,7 +55,7 @@ ECommandStatus CommandRoomList::ProcessCommand(const FString& line)
 	return ECommandStatus::None;
 }
 
-void CommandRoomList::ParseRoomData(const FString& line, int32& index, int32& currentUser, int32& maxUser, FString& title)
+void CommandRoomList::ParseRoomData( const FString& line, int32& index, int32& currentUser, int32& maxUser, FString& title )
 {
 	static TArray<FString> tokens;
 	int32 startTitle = 0;
@@ -63,34 +63,34 @@ void CommandRoomList::ParseRoomData(const FString& line, int32& index, int32& cu
 	{
 		int32 startIndex = 0;
 		int32 endIndex = 0;
-		line.FindChar(TEXT('['), startIndex);
-		line.FindChar(TEXT(']'), endIndex);
+		line.FindChar( TEXT( '[' ), startIndex );
+		line.FindChar( TEXT( ']' ), endIndex );
 		startIndex += 1;
 		endIndex -= 1;
-		FString indexString = line.Mid(startIndex, endIndex - startIndex + 1).TrimStartAndEnd();
-		index = FCString::Atoi(*indexString);
+		FString indexString = line.Mid( startIndex, endIndex - startIndex + 1 ).TrimStartAndEnd();
+		index = FCString::Atoi( *indexString );
 	}
 	// 유저카운트 파싱
 	{
 		int32 startIndex = 0;
 		int32 endIndex = 0;
-		line.FindChar(TEXT('('), startIndex);
-		line.FindChar(TEXT(')'), endIndex);
+		line.FindChar( TEXT( '(' ), startIndex );
+		line.FindChar( TEXT( ')' ), endIndex );
 		startIndex += 1;
 		endIndex -= 1;
-		FString userCountString = line.Mid(startIndex, endIndex - startIndex + 1).TrimStartAndEnd();
+		FString userCountString = line.Mid( startIndex, endIndex - startIndex + 1 ).TrimStartAndEnd();
 
 		tokens.Empty();
-		const TCHAR* a = TEXT("/");
-		userCountString.ParseIntoArray(tokens, &a, 1);
+		const TCHAR* a = TEXT( "/" );
+		userCountString.ParseIntoArray( tokens, &a, 1 );
 
-		currentUser = FCString::Atoi(*(tokens[0].TrimStartAndEnd()));
-		maxUser = FCString::Atoi(*(tokens[1].TrimStartAndEnd()));
+		currentUser = FCString::Atoi( *( tokens[ 0 ].TrimStartAndEnd() ) );
+		maxUser = FCString::Atoi( *( tokens[ 1 ].TrimStartAndEnd() ) );
 
 		startTitle = endIndex + 2;
 	}
 	// 타이틀 파싱
 	{
-		title = line.Mid(startTitle).TrimStartAndEnd();
+		title = line.Mid( startTitle ).TrimStartAndEnd();
 	}
 }
