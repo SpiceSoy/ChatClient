@@ -13,19 +13,24 @@ UCLASS()
 class CHATCLIENT_API URoomData : public UObject
 {
 	GENERATED_BODY()
-
+	DECLARE_DELEGATE(FChangedData);
 public:
 	URoomData();
 	virtual ~URoomData() = default;
 	void Set(int32 index, const FString& title, int32 currentUserCount, int32 maxUserCount);
+	void SetConnection(const TWeakObjectPtr<class UChatConnection>& connection);
 	const FString& GetTitle() const;
 	int32 GetIndex() const;
 	int32 GetCurrentUserCount() const;
 	int32 GetMaxUserCount() const;
+	const TWeakObjectPtr<UChatConnection>& GetConnection() const;
 
+	FChangedData& GetChangedData();
 private:
 	int32 Index;
 	FString Title;
 	int32 CurrentUserCount;
 	int32 MaxUserCount;
+	TWeakObjectPtr<UChatConnection> Connection;
+	FChangedData ChangedData;
 };

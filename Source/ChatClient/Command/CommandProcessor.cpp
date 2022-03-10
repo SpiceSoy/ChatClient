@@ -2,14 +2,21 @@
 
 
 #include "CommandProcessor.h"
-#include "CommandUserList.h"
+#include "CommandEnterRoom.h"
+#include "CommandLogin.h"
+#include "CommandQuitRoom.h"
 #include "CommandRoomList.h"
+#include "CommandUserList.h"
 #include "BaseCommand.h"
 
 FCommandProcessor::FCommandProcessor()
 {
+	loginCommand = MakeUnique<CommandLogin>(*this);
+
 	Commands.Add(MakeUnique<CommandUserList>(*this));
 	Commands.Add(MakeUnique<CommandRoomList>(*this));
+	Commands.Add(MakeUnique<CommandEnterRoom>(*this));
+	Commands.Add(MakeUnique<CommandQuitRoom>(*this));
 }
 
 FCommandProcessor::~FCommandProcessor()
@@ -60,6 +67,33 @@ void FCommandProcessor::PostCompleteChangedOfRoomData()
 	if (ChangedRoomList.IsBound()) ChangedRoomList.Execute(RoomDatas);
 }
 
+void FCommandProcessor::PostLoginComplete()
+{
+	IsLoginState = false;
+	SucceededLogin.ExecuteIfBound();
+}
+
+void FCommandProcessor::PostLoginFailed(const FString& info)
+{
+	IsLoginState = true;
+	FailedLogin.ExecuteIfBound(info);
+}
+
+void FCommandProcessor::PostEnteredRoom()
+{
+	EnteredRoom.ExecuteIfBound();
+}
+
+void FCommandProcessor::PostExitedRoom()
+{
+	ExitedRoom.ExecuteIfBound();
+}
+
+void FCommandProcessor::TurnOnLoginState()
+{
+	IsLoginState = true;
+}
+
 FCommandProcessor::FChangedUserList& FCommandProcessor::GetChangedUserList()
 {
 	return ChangedUserList;
@@ -70,9 +104,36 @@ FCommandProcessor::FChangedRoomList& FCommandProcessor::GetChangedRoomList()
 	return ChangedRoomList;
 }
 
+FCommandProcessor::FSucceededLogin& FCommandProcessor::GetSucceededLogin()
+{
+	return SucceededLogin;
+}
+
+FCommandProcessor::FFailedLogin& FCommandProcessor::GetFailedLogin()
+{
+	return FailedLogin;
+}
+
+FCommandProcessor::FEnteredRoom& FCommandProcessor::GetEnteredRoom()
+{
+	return EnteredRoom;
+}
+
+FCommandProcessor::FExitedRoom& FCommandProcessor::GetExitedRoom()
+{
+	return ExitedRoom;
+}
+
 bool FCommandProcessor::ProcessLine(const FString& line)
 {
 	UE_LOG(LogTemp, Log, TEXT("%s"), *line);
+
+	if(IsLoginState && loginCommand)
+	{
+		loginCommand->ProcessCommand(line);
+		return false;
+	}
+
 	bool hasCurrentCmd = CurrentCommand != NO_COMMAND;
 	int32 i = hasCurrentCmd ? CurrentCommand : 0;
 	int32 maxCommand = hasCurrentCmd ? CurrentCommand + 1 : Commands.Num();

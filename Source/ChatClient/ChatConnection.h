@@ -38,6 +38,7 @@ public:
 	void Close();
 	void Process();
 	void SendText(const FString& str);
+	void SendCommand(const FString& str);
 	void SetChatUi(const TWeakObjectPtr<class UChatTemplate>& ptr);
 private:
 	TArray<uint8> RecvBuffer;
@@ -47,13 +48,20 @@ private:
 	class FSocket* Socket = nullptr;
 	class FRunnableThread* RunRead = nullptr;
 	bool IsConnected = false;
+	bool IsLogin = false;
+	bool IsInRoom = false;
 	TWeakObjectPtr<UChatTemplate> ChatUi;
-	//TWeakObjectPtr<UChatWidget> ChatWidget;
 	FCommandProcessor CommandProcessor;
+	FString Name;
 
 	void OnSessionClosed();
 	void OnLineReceived(const FString& line);
 	void BindDelegate();
+
+
+
+	void SetLogin(bool isLogin);
+	bool GetLogin() const;
 
 private:
 	void ProcessRecv();

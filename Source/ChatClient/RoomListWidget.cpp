@@ -12,5 +12,9 @@ void URoomListWidget::NativeOnInitialized()
 
 void URoomListWidget::SetRoomList(const TArray<URoomData*>& arr)
 {
-	if(ListViewRoom) ListViewRoom->SetListItems(arr);
+	if(ListViewRoom)
+	{
+		ListViewRoom->ClearListItems();
+		ListViewRoom->SetListItems(arr);
+	}
 }

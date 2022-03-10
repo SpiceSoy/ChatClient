@@ -2,6 +2,7 @@
 
 
 #include "RoomData.h"
+#include "ChatConnection.h"
 
 URoomData::URoomData()
 	: UObject()
@@ -15,6 +16,12 @@ void URoomData::Set(int32 index, const FString& title, int32 currnet, int32 max)
 	Title = title;
 	CurrentUserCount = currnet;
 	MaxUserCount = max;
+	ChangedData.ExecuteIfBound();
+}
+
+void URoomData::SetConnection(const TWeakObjectPtr<class UChatConnection>& connection)
+{
+	Connection = connection;
 }
 
 const FString& URoomData::GetTitle() const
@@ -35,4 +42,14 @@ int32 URoomData::GetCurrentUserCount() const
 int32 URoomData::GetMaxUserCount() const
 {
 	return MaxUserCount;
+}
+
+const TWeakObjectPtr<class UChatConnection>& URoomData::GetConnection() const
+{
+	return Connection;
+}
+
+URoomData::FChangedData& URoomData::GetChangedData()
+{
+	return ChangedData;
 }

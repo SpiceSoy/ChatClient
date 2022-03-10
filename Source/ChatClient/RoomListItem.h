@@ -17,15 +17,9 @@ class CHATCLIENT_API URoomListItem : public UUserWidget, public IUserObjectListE
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UTextBlock* TextName = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UTextBlock* TextIndex = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UTextBlock* TextUser = nullptr;
+	class URoomListItemInternal* roomListInternalWidget = nullptr;
 protected:
 	virtual void NativeOnInitialized() override;
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	virtual void NativeOnListItemObjectSet(UObject* listItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool isSelected) override;
 };

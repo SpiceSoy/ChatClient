@@ -32,6 +32,7 @@ FCommandProcessor& UChatConnection::GetCommandProcessor()
 
 bool UChatConnection::Connect(uint32 address, uint32 port)
 {
+	if(IsConnected) return true;
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
 
 	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -64,11 +65,16 @@ void UChatConnection::Process()
 void UChatConnection::SendText(const FString& str)
 {
 	if (!IsConnected) return;
-	if (GetSendBufferSize() < SendBytes + str.Len() * sizeof(WIDECHAR))
-	{
-		GrowSendBuffer();
-	}
+	bool bufferSizeWillOver = GetSendBufferSize() < SendBytes + str.Len() * sizeof(WIDECHAR);
+	if (bufferSizeWillOver) GrowSendBuffer();
 	SendBytes += ConvertToMBCS(str, SendBuffer.GetData() + SendBytes, GetSendBufferSize() - SendBytes);
+}
+
+void UChatConnection::SendCommand(const FString& str)
+{
+	static const FString prefix = TEXT("/");
+	if(IsInRoom) SendText(prefix + str);
+	else SendText(str);
 }
 
 void UChatConnection::SetChatUi(const TWeakObjectPtr<UChatTemplate>& ptr)
@@ -77,15 +83,16 @@ void UChatConnection::SetChatUi(const TWeakObjectPtr<UChatTemplate>& ptr)
 	BindDelegate();
 }
 
-//void UChatConnection::SetWidget(const TWeakObjectPtr<UChatWidget>& ptr)
-//{
-//	ChatWidget = ptr;
-//	BindDelegate();
-//}
-
 void UChatConnection::OnSessionClosed()
 {
-	//if (ChatWidget.IsValid()) ChatWidget->AppendLog(TEXT("연결이 종료되었습니다.\n"));
+	if (!ChatUi.IsValid()) return;
+	ChatUi->SetUserName(TEXT("연결 종료됨"));
+	ChatUi->OnClickedTabConnect();
+	TWeakObjectPtr<UConnectWidget> connectWidget = ChatUi->GetConnectWidget();
+	if(!connectWidget.IsValid()) return;
+	connectWidget->SetConnectionInfoText(TEXT("연결이 종료되었습니다."));
+	IsConnected = false;
+	IsLogin = false;
 }
 
 void UChatConnection::OnLineReceived(const FString& line)
@@ -117,7 +124,7 @@ void UChatConnection::BindDelegate()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
-			thisPtr->SendText(TEXT("US"));
+			thisPtr->SendCommand(TEXT("US"));
 		}
 	);
 	chatWidget->GetChagedTabRoomList().BindLambda(
@@ -125,7 +132,7 @@ void UChatConnection::BindDelegate()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
-			thisPtr->SendText(TEXT("LT"));
+			thisPtr->SendCommand(TEXT("LT"));
 		}
 	);
 
@@ -139,24 +146,7 @@ void UChatConnection::BindDelegate()
 	);
 
 	connectWidget->GetClickedConnectBtn().BindLambda(
-		[thisObjPtr, connectWidget](uint32 address, uint32 port)
-		{
-			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_START"));
-			if (!thisObjPtr.IsValid()) return;
-			UChatConnection* thisPtr = thisObjPtr.Get();
-			if (!connectWidget.IsValid()) return;
-			UConnectWidget* chatWidget = connectWidget.Get();
-
-
-			bool connectionResult = thisPtr->Connect(address, port);
-			if (connectionResult) chatWidget->SetConnectionInfoText(TEXT("연결이 성공하였습니다.\n"));
-			else chatWidget->SetConnectionInfoText(TEXT("연결이 실패하였습니다.\n"));
-			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
-		}
-	);
-
-	connectWidget->GetClickedLoginBtn().BindLambda(
-		[thisObjPtr, connectWidget, chatWidget](const FString& name)
+		[thisObjPtr, connectWidget, chatWidget](uint32 address, uint32 port)
 		{
 			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_START"));
 			if (!thisObjPtr.IsValid()) return;
@@ -166,10 +156,44 @@ void UChatConnection::BindDelegate()
 			if (!chatWidget.IsValid()) return;
 			UChatTemplate* chatWidgetPtr = chatWidget.Get();
 
+			if(thisPtr->IsConnected)
+			{
+				connectWidgetPtr->SetConnectionInfoText(TEXT("이미 연결 중입니다."));
+				return;
+			}
+
+			bool connectionResult = thisPtr->Connect(address, port);
+			if (connectionResult)
+			{
+				connectWidgetPtr->SetConnectionInfoText(TEXT("연결이 성공하였습니다."));
+				chatWidgetPtr->SetUserName(TEXT("로그인 대기 중"));
+			}
+			else 
+			{
+				connectWidgetPtr->SetConnectionInfoText(TEXT("연결이 실패하였습니다."));
+			}
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
+		}
+	);
+
+	connectWidget->GetClickedLoginBtn().BindLambda(
+		[thisObjPtr, connectWidget](const FString& name)
+		{
+			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_START"));
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!connectWidget.IsValid()) return;
+			UConnectWidget* connectWidgetPtr = connectWidget.Get();
+
+			if(thisPtr->IsLogin)
+			{
+				connectWidgetPtr->SetConnectionInfoText(TEXT("이미 로그인 중입니다."));
+				return;
+			}
+
 			FString idCommand = FString::Printf(TEXT("LOGIN %s"), *name);
 			thisPtr->SendText(idCommand);
-			chatWidgetPtr->SetUserName(name);
-			chatWidgetPtr->OnClickedTabLobby();
+			thisPtr->Name = name;
 			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
 		}
 	);
@@ -192,11 +216,70 @@ void UChatConnection::BindDelegate()
 			UChatConnection* thisPtr = thisObjPtr.Get();
 			if (!roomListWidget.IsValid()) return;
 			URoomListWidget* roomListWidgetPtr = roomListWidget.Get();
+
+			for (URoomData* data : arr) data->SetConnection(thisObjPtr);
+
 			roomListWidgetPtr->SetRoomList(arr);
 		}
 	);
 
+	CommandProcessor.GetSucceededLogin().BindLambda(
+		[thisObjPtr]()
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			thisPtr->SetLogin(true);
+		}
+	);
 
+	CommandProcessor.GetFailedLogin().BindLambda(
+		[thisObjPtr, connectWidget](const FString& info)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!connectWidget.IsValid()) return;
+			UConnectWidget* connectWidgetPtr = connectWidget.Get();
+			connectWidgetPtr->SetConnectionInfoText(info);
+		}
+	);
+
+	CommandProcessor.GetEnteredRoom().BindLambda(
+		[thisObjPtr, chatWidget]()
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			thisPtr->IsInRoom = true;
+
+			if (!chatWidget.IsValid()) return;
+			UChatTemplate* chatWidgetPtr = chatWidget.Get();
+			chatWidgetPtr->OnClickedTabLobby();
+		}
+	);
+
+	CommandProcessor.GetExitedRoom().BindLambda(
+		[thisObjPtr]()
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			thisPtr->IsInRoom = false;
+		}
+	);
+
+}
+
+void UChatConnection::SetLogin(bool isLogin)
+{
+	IsLogin = isLogin;
+	if(isLogin)
+	{
+		ChatUi->SetUserName(Name);
+		ChatUi->OnClickedTabLobby();
+	}
+}
+
+bool UChatConnection::GetLogin() const
+{
+	return IsLogin;
 }
 
 void UChatConnection::ProcessRecv()
@@ -307,3 +390,4 @@ uint32 UChatConnection::ConvertToMBCS(const FString& srcStr, uint8* destBuffer, 
 	auto result = codecvt.out(state, *srcStr, *srcStr + size, newWCharLast, (char*)destBuffer, (char*)(destBuffer + size), newLast);
 	return strlen((const char*)destBuffer) + 1;
 }
+
