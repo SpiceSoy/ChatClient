@@ -2,7 +2,6 @@
 
 
 #include "ChatGameInstance.h"
-#include "ChatWidget.h"
 #include "ChatTemplate.h"
 #include "ChatConnection.h"
 #include "ChatPlayerController.h"

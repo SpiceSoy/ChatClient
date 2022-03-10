@@ -2,7 +2,6 @@
 
 
 #include "ChatConnection.h"
-#include "ChatWidget.h"
 #include "ChatTemplate.h"
 #include "ChatPageWidget.h"
 #include "ConnectWidget.h"

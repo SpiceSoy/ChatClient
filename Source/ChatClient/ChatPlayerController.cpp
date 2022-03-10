@@ -4,7 +4,6 @@
 #include "ChatPlayerController.h"
 #include "ChatConnection.h"
 #include "ChatGameInstance.h"
-#include "ChatWidget.h"
 #include "ChatTemplate.h"
 
 AChatPlayerController::AChatPlayerController()
