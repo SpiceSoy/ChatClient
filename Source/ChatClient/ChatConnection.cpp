@@ -1,17 +1,26 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file ChatConnection.h
+//
+// @brief 채팅 서버와 소켓 통신을 하기 위한 클래스입니다.
+//
+// @date 2022/03/07
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
 #include "ChatConnection.h"
-#include "ChatTemplate.h"
-#include "ChatPageWidget.h"
-#include "ConnectWidget.h"
-#include "UserListWidget.h"
-#include "RoomListWidget.h"
 #include "Command/CommandProcessor.h"
+#include "Widget/ChatPageWidget.h"
+#include "Widget/ChatTemplate.h"
+#include "Widget/ConnectWidget.h"
+#include "Widget/RoomListWidget.h"
+#include "Widget/UserListWidget.h"
 #include "Containers/StringConv.h"
 #include <codecvt>
 #include <vector>
 #include <stdlib.h>
+
 
 UChatConnection::UChatConnection()
 {

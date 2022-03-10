@@ -1,13 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file RoomData.h
+//
+// @brief 대화방 목록 공유를 위한 대화방 정보 클래스입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
 #include "RoomData.h"
 #include "ChatConnection.h"
 
+
 URoomData::URoomData()
 	: UObject()
 {
-	Set(93939393, TEXT("ERROR_ROOM"), 0, 0);
+	Set(ERROR_NUM, ERROR_TITLE, ERROR_NUM, ERROR_NUM);
 }
 
 void URoomData::Set(int32 index, const FString& title, int32 currnet, int32 max)
@@ -24,7 +33,6 @@ void URoomData::SetPtr(const TWeakObjectPtr<class UChatConnection>& connection, 
 	Connection = connection;
 	ChatUi = chatUi;
 }
-
 
 const FString& URoomData::GetTitle() const
 {

@@ -1,9 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file ChatGameInstance.h
+//
+// @brief 채팅 위젯, 채팅 커넥션 클래스 인스턴스를 보유하기 위한 게임 인스턴스입니다.
+//
+// @date 2022/03/07
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
+
 
 #pragma once
-
-#include "CoreMinimal.h"
 #include "ChatConnection.h"
+#include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "ChatGameInstance.generated.h"
 

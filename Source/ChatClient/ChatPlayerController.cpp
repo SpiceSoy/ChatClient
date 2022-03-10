@@ -1,10 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file ChatPlayerController.h
+//
+// @brief 커넥션 생성 및 위젯 생성, 커넥션의 틱 함수를 부르기 위한 플레이어 컨트롤러 클래스입니다.
+//
+// @date 2022/03/07
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
 #include "ChatPlayerController.h"
 #include "ChatConnection.h"
 #include "ChatGameInstance.h"
-#include "ChatTemplate.h"
+#include "Widget/ChatTemplate.h"
 
 AChatPlayerController::AChatPlayerController()
 {

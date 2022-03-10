@@ -1,14 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file UserData.h
+//
+// @brief 이용자 목록 공유를 위한 대화방 정보 클래스입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
 #include "UserData.h"
-#include "ChatTemplate.h"
 #include "ChatConnection.h"
+#include "ChatTemplate.h"
+
 
 UUserData::UUserData()
 	: UObject()
 {
-	Set(TEXT("ERROR_NAME"), TEXT("ERR.ERR.ERR.ERR"));
+	Set(ERROR_NAME, ERROR_ADDR);
 }
 
 void UUserData::Set(const FString& name, const FString address)

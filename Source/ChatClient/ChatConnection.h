@@ -1,22 +1,22 @@
 //=================================================================================================
 // @file ChatConnection.h
 //
-// @brief utill class to connect chat server and recv, send packets 
+// @brief 채팅 서버와 소켓 통신을 하기 위한 클래스입니다.
 //
 // @date 2022/03/07
 //
 // Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
 //=================================================================================================
 
-#pragma once
 
+#pragma once
+#include "Command/CommandProcessor.h"
 #include "CoreMinimal.h"
+#include "Containers/Queue.h"
 #include "Engine.h"
 #include "Networking.h"
 #include "Sockets.h"
 #include "SocketSubsystem.h"
-#include "Command/CommandProcessor.h"
-#include "Containers/Queue.h"
 #include "ChatConnection.generated.h"
 
 
@@ -28,7 +28,21 @@ class CHATCLIENT_API UChatConnection : public UObject
 {
 
 	 GENERATED_BODY()
+private:
+	TArray<uint8> RecvBuffer;
+	int32 RecvBytes = 0;
+	TArray<uint8> SendBuffer;
+	int32 SendBytes = 0;
 
+	class FSocket* Socket = nullptr;
+
+	bool IsConnected = false;
+	bool IsLogin = false;
+	bool IsInRoom = false;
+
+	TWeakObjectPtr<UChatTemplate> ChatUi;
+	FCommandProcessor CommandProcessor;
+	FString Name;
 public:
 	UChatConnection();
 	~UChatConnection();
@@ -40,28 +54,13 @@ public:
 	void SendText(const FString& str);
 	void SendCommand(const FString& str);
 	void SetChatUi(const TWeakObjectPtr<class UChatTemplate>& ptr);
-private:
-	TArray<uint8> RecvBuffer;
-	int32 RecvBytes = 0;
-	TArray<uint8> SendBuffer;
-	int32 SendBytes = 0;
-	class FSocket* Socket = nullptr;
-	class FRunnableThread* RunRead = nullptr;
-	bool IsConnected = false;
-	bool IsLogin = false;
-	bool IsInRoom = false;
-	TWeakObjectPtr<UChatTemplate> ChatUi;
-	FCommandProcessor CommandProcessor;
-	FString Name;
 
 	void OnSessionClosed();
 	void OnLineReceived(const FString& line);
 	void BindDelegate();
 
-
-
-	void SetLogin(bool isLogin);
 	bool GetLogin() const;
+	void SetLogin(bool isLogin);
 
 private:
 	void ProcessRecv();
@@ -71,6 +70,7 @@ private:
 	void GrowSendBuffer();
 	int32 GetRecvBufferSize() const;
 	int32 GetSendBufferSize() const;
+
 	static FString ConvertToWBCS(uint8* srcBuffer, uint32 size);
 	static uint32 ConvertToMBCS(const FString& srcStr, uint8* destBuffer, uint32 size);
 };
