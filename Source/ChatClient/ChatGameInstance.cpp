@@ -27,7 +27,7 @@ TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
 
 UChatGameInstance::UChatGameInstance()
 {
-	static ConstructorHelpers::FClassFinder<UChatMainWidget> chatTemplateClass( TEXT( "/Game/UI/BPChatTemplate" ) );
+	static ConstructorHelpers::FClassFinder<UChatMainWidget> chatTemplateClass( TEXT( "/Game/UI/BPChatMain" ) );
 	if( chatTemplateClass.Succeeded() )
 	{
 		ChatTemplateClass = chatTemplateClass.Class;
