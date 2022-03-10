@@ -1,12 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file CommandButton.cpp
+//
+// @brief 명령어 버튼을 위한 람다 함수 등록 버튼 클래스 입니다.
+//
+// @date 2022/03/07
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
-#include "CommandButton.h"
+#include "Widget/CommandButton.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 
+
 constexpr const TCHAR* ID_TB_TITLE = TEXT("TB_Title");
 constexpr const TCHAR* ID_B_BUTTON = TEXT("B_Button");
+
 
 void UCommandButton::SetFuctor(const std::function<void()>& functor)
 {

@@ -24,7 +24,7 @@ class CHATCLIENT_API AChatPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 private:
-	TWeakObjectPtr<class UChatTemplate> ChatTemplate = nullptr;
+	TWeakObjectPtr<class UChatMainWidget> ChatTemplate = nullptr;
 	TWeakObjectPtr<class UChatConnection> ChatConnection = nullptr;
 
 public:

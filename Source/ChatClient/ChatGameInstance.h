@@ -25,7 +25,7 @@ class CHATCLIENT_API UChatGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	TWeakObjectPtr<class UChatTemplate> GetChatWidget() const;
+	TWeakObjectPtr<class UChatMainWidget> GetChatWidget() const;
 	TWeakObjectPtr<class UChatConnection> GetChatConnection() const;
 	UChatGameInstance();
 	~UChatGameInstance();
@@ -35,9 +35,9 @@ public:
 protected:
 	virtual void Init() override;
 private:
-	TSubclassOf<class UChatTemplate> ChatTemplateClass;
+	TSubclassOf<class UChatMainWidget> ChatTemplateClass;
 	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
-	class UChatTemplate* ChatTemplate = nullptr;
+	class UChatMainWidget* ChatTemplate = nullptr;
 
 	UPROPERTY( VisibleAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = "true" ) )
 	class UChatConnection* ChatConnection = nullptr;

@@ -12,12 +12,12 @@
 #include "ChatGameInstance.h"
 #include "ChatConnection.h"
 #include "ChatPlayerController.h"
-#include "Widget/ChatTemplate.h"
+#include "Widget/ChatMainWidget.h"
 
 
-TWeakObjectPtr<UChatTemplate> UChatGameInstance::GetChatWidget() const
+TWeakObjectPtr<UChatMainWidget> UChatGameInstance::GetChatWidget() const
 {
-	return MakeWeakObjectPtr<UChatTemplate>( ChatTemplate );
+	return MakeWeakObjectPtr<UChatMainWidget>( ChatTemplate );
 }
 
 TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
@@ -27,7 +27,7 @@ TWeakObjectPtr<UChatConnection> UChatGameInstance::GetChatConnection() const
 
 UChatGameInstance::UChatGameInstance()
 {
-	static ConstructorHelpers::FClassFinder<UChatTemplate> chatTemplateClass( TEXT( "/Game/UI/BPChatTemplate" ) );
+	static ConstructorHelpers::FClassFinder<UChatMainWidget> chatTemplateClass( TEXT( "/Game/UI/BPChatTemplate" ) );
 	if( chatTemplateClass.Succeeded() )
 	{
 		ChatTemplateClass = chatTemplateClass.Class;
@@ -48,7 +48,7 @@ void UChatGameInstance::CreateChatWidget( AChatPlayerController* owner )
 {
 	if( ChatTemplateClass )
 	{
-		ChatTemplate = CreateWidget<UChatTemplate>( owner, ChatTemplateClass, TEXT( "ChatWidget" ) );
+		ChatTemplate = CreateWidget<UChatMainWidget>( owner, ChatTemplateClass, TEXT( "ChatWidget" ) );
 		UE_LOG( LogTemp, Log, TEXT( "CALL UChatGameInstance::Init" ) );
 	}
 }

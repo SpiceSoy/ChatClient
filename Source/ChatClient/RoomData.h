@@ -29,16 +29,16 @@ private:
 	int32 MaxUserCount;
 	FString Title;
 	TWeakObjectPtr<class UChatConnection> Connection;
-	TWeakObjectPtr<class UChatTemplate> ChatUi;
+	TWeakObjectPtr<class UChatMainWidget> ChatUi;
 	FChangedData ChangedData;
-	constexpr static int32 ERROR_NUM = 9393939393;
-	constexpr static FString ERROR_TITLE = TEXT( "ERROR_ROOM" );
+	constexpr static int32 ERROR_NUM = 999999;
+	constexpr static const TCHAR* ERROR_TITLE = TEXT( "ERROR_ROOM" );
 public:
 	URoomData();
 	virtual ~URoomData() = default;
 
 	void Set( int32 index, const FString& title, int32 currentUserCount, int32 maxUserCount );
-	void SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi );
+	void SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatMainWidget>& chatUi );
 
 	const FString& GetTitle() const;
 	int32 GetIndex() const;
@@ -46,5 +46,5 @@ public:
 	int32 GetCurrentUserCount() const;
 	FChangedData& GetChangedData();
 	const TWeakObjectPtr<UChatConnection>& GetConnection() const;
-	const TWeakObjectPtr<UChatTemplate>& GetChatUi() const;
+	const TWeakObjectPtr<UChatMainWidget>& GetChatUi() const;
 };

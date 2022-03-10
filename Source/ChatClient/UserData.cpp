@@ -11,7 +11,7 @@
 
 #include "UserData.h"
 #include "ChatConnection.h"
-#include "ChatTemplate.h"
+#include "WIdget/ChatMainWidget.h"
 
 
 UUserData::UUserData()
@@ -26,7 +26,7 @@ void UUserData::Set( const FString& name, const FString address )
 	Address = address;
 }
 
-void UUserData::SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatTemplate>& chatUi )
+void UUserData::SetPtr( const TWeakObjectPtr<UChatConnection>& connection, const TWeakObjectPtr<UChatMainWidget>& chatUi )
 {
 	Connection = connection;
 	ChatUi = chatUi;
@@ -47,7 +47,7 @@ const TWeakObjectPtr<UChatConnection>& UUserData::GetConnection() const
 	return Connection;
 }
 
-const TWeakObjectPtr<UChatTemplate>& UUserData::GetChatUi() const
+const TWeakObjectPtr<UChatMainWidget>& UUserData::GetChatUi() const
 {
 	return ChatUi;
 }

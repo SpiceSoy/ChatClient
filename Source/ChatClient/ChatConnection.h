@@ -40,7 +40,7 @@ private:
 	bool IsLogin = false;
 	bool IsInRoom = false;
 
-	TWeakObjectPtr<class UChatTemplate> ChatUi;
+	TWeakObjectPtr<class UChatMainWidget> ChatUi;
 	FCommandProcessor CommandProcessor;
 	FString Name;
 public:
@@ -53,7 +53,7 @@ public:
 	void Process();
 	void SendText( const FString& str );
 	void SendCommand( const FString& str );
-	void SetChatUi( const TWeakObjectPtr<class UChatTemplate>& ptr );
+	void SetChatUi( const TWeakObjectPtr<class UChatMainWidget>& ptr );
 
 	void OnSessionClosed();
 	void OnLineReceived( const FString& line );

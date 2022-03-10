@@ -1,22 +1,34 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file ChatMainWidget.h
+//
+// @brief 위젯 메인 페이지 클래스입니다.
+//
+// @date 2022/03/07
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
+
 
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ChatTemplate.generated.h"
+#include "ChatMainWidget.generated.h"
+
 
 /**
  * 
  */
 UCLASS()
-class CHATCLIENT_API UChatTemplate : public UUserWidget
+class CHATCLIENT_API UChatMainWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	DECLARE_DELEGATE(FChangedTab);
-protected:
-	virtual void NativeOnInitialized() override;
 private:
+	FChangedTab ChagedTabConnect;
+	FChangedTab ChagedTabLobby;
+	FChangedTab ChagedTabRoomList;
+	FChangedTab ChagedTabUserList;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UTextBlock* TextTitle;
 
@@ -39,44 +51,39 @@ private:
 	class UWidgetSwitcher* WidgetSwitcher = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UConnectWidget* ConnectWidget = nullptr;
+	class UConnectPage* ConnectWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UChatPageWidget* LobbyWidget = nullptr;
+	class UChatPage* ChatPage = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UUserListWidget* UserListWidget = nullptr;
+	class UUserListPage* UserListWidget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class URoomListWidget* RoomListWidget = nullptr;
-
-	FChangedTab ChagedTabConnect;
-	FChangedTab ChagedTabLobby;
-	FChangedTab ChagedTabUserList;
-	FChangedTab ChagedTabRoomList;
-
+	class URoomListPage* RoomListWidget = nullptr;
 public:
-	UFUNCTION()
-	void OnClickedTabConnect();
-	UFUNCTION()
-	void OnClickedTabLobby();
-	UFUNCTION()
-	void OnClickedTabUserList();
-	UFUNCTION()
-	void OnClickedTabRoomList();
-
 	void SetWidgetIndex(int32 index) const;
 	void SetTitle(const FString& title) const;
 	void SetUserName(const FString& title) const;
 
-	TWeakObjectPtr<UConnectWidget> GetConnectWidget() const;
-	TWeakObjectPtr<UChatPageWidget> GetLobbyWidget() const;
-	TWeakObjectPtr<UUserListWidget> GetUserListWidget() const;
-	TWeakObjectPtr<URoomListWidget> GetRoomListWidget() const;
+	TWeakObjectPtr<UChatPage> GetChatPage() const;
+	TWeakObjectPtr<UConnectPage> GetConnectPage() const;
+	TWeakObjectPtr<URoomListPage> GetRoomListPage() const;
+	TWeakObjectPtr<UUserListPage> GetUserListPage() const;
 
 	FChangedTab& GetChagedTabConnect();
-	FChangedTab& GetChagedTabLobby();
-	FChangedTab& GetChagedTabUserList();
+	FChangedTab& GetChagedTabChat();
 	FChangedTab& GetChagedTabRoomList();
+	FChangedTab& GetChagedTabUserList();
 
+	UFUNCTION()
+	void OnClickedTabConnect();
+	UFUNCTION()
+	void OnClickedTabChat();
+	UFUNCTION()
+	void OnClickedTabUserList();
+	UFUNCTION()
+	void OnClickedTabRoomList();
+protected:
+	virtual void NativeOnInitialized() override;
 };

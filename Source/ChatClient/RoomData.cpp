@@ -28,7 +28,7 @@ void URoomData::Set( int32 index, const FString& title, int32 currnet, int32 max
 	ChangedData.ExecuteIfBound();
 }
 
-void URoomData::SetPtr( const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatTemplate>& chatUi )
+void URoomData::SetPtr( const TWeakObjectPtr<class UChatConnection>& connection, const TWeakObjectPtr<class UChatMainWidget>& chatUi )
 {
 	Connection = connection;
 	ChatUi = chatUi;
@@ -59,7 +59,7 @@ const TWeakObjectPtr<class UChatConnection>& URoomData::GetConnection() const
 	return Connection;
 }
 
-const TWeakObjectPtr<class UChatTemplate>& URoomData::GetChatUi() const
+const TWeakObjectPtr<class UChatMainWidget>& URoomData::GetChatUi() const
 {
 	return ChatUi;
 }

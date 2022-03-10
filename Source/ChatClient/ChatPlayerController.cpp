@@ -12,7 +12,7 @@
 #include "ChatPlayerController.h"
 #include "ChatConnection.h"
 #include "ChatGameInstance.h"
-#include "Widget/ChatTemplate.h"
+#include "Widget/ChatMainWidget.h"
 
 AChatPlayerController::AChatPlayerController()
 {

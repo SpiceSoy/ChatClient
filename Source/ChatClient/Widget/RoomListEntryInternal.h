@@ -1,16 +1,25 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file RoomListEntryInternal.h
+//
+// @brief RoomListEntry가 실시간 반영이 불가능해서 실시간 갱신을 위해 만든 내부 위젯입니다.
+//
+// @date 2022/03/10
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
+
 
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RoomListItemInternal.generated.h"
+#include "RoomListEntryInternal.generated.h"
+
 
 /**
  * 
  */
 UCLASS()
-class CHATCLIENT_API URoomListItemInternal : public UUserWidget
+class CHATCLIENT_API URoomListEntryInternal : public UUserWidget
 {
 	GENERATED_BODY()
 
