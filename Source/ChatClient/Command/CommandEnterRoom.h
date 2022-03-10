@@ -19,5 +19,6 @@ class CHATCLIENT_API CommandEnterRoom : public BaseCommand
 {
 public:
 	CommandEnterRoom(FCommandProcessor& processor);
-	virtual ECommandStatus ProcessCommand(const FString& line);
+
+	virtual ECommandStatus ProcessCommand(const FString& line) override;
 };

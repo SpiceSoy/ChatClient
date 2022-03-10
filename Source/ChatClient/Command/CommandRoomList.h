@@ -19,7 +19,8 @@ class CHATCLIENT_API CommandRoomList : public BaseCommand
 {
 public:
 	CommandRoomList(FCommandProcessor& processor);
-	virtual ECommandStatus ProcessCommand(const FString& line);
+
+	virtual ECommandStatus ProcessCommand(const FString& line) override;
 private:
 	void ParseRoomData(const FString& line, int32& index, int32& currentUser, int32& maxUser, FString& title);
 };

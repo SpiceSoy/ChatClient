@@ -19,5 +19,6 @@ class CHATCLIENT_API CommandLogin : public BaseCommand
 {
 public:
 	CommandLogin(FCommandProcessor& processor);
-	virtual ECommandStatus ProcessCommand(const FString& line);
+
+	virtual ECommandStatus ProcessCommand(const FString& line) override;
 };

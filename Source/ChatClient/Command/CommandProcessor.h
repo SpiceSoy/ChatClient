@@ -27,6 +27,31 @@ class CHATCLIENT_API FCommandProcessor
 	DECLARE_DELEGATE_OneParam(FFailedLogin, const FString&);
 	DECLARE_DELEGATE(FEnteredRoom);
 	DECLARE_DELEGATE(FExitedRoom);
+private:
+	FChangedUserList ChangedUserList;
+	FChangedRoomList ChangedRoomList;
+	FSucceededLogin SucceededLogin;
+	FFailedLogin FailedLogin;
+	FEnteredRoom EnteredRoom;
+	FExitedRoom ExitedRoom;
+
+	TUniquePtr<BaseCommand> loginCommand;
+	TArray<TUniquePtr<BaseCommand>> Commands;
+	TArray<int32> CommandBypassCounts;
+
+	static constexpr int32 NO_COMMAND = -1;
+	int32 CurrentCommand = NO_COMMAND;
+	bool IsLoginState = true;
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TArray<UUserData*> UserDataPool;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TArray<UUserData*> UserDatas;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TArray<URoomData*> RoomDataPool;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TArray<URoomData*> RoomDatas;
 public:
 	FCommandProcessor();
 	FCommandProcessor(const FCommandProcessor&) = delete;
@@ -40,35 +65,7 @@ public:
 	FFailedLogin& GetFailedLogin();
 	FEnteredRoom& GetEnteredRoom();
 	FExitedRoom& GetExitedRoom();
-private:
-	FChangedUserList ChangedUserList;
-	FChangedRoomList ChangedRoomList;
-	FSucceededLogin SucceededLogin;
-	FFailedLogin FailedLogin;
-	FEnteredRoom EnteredRoom;
-	FExitedRoom ExitedRoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<UUserData*> UserDataPool;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<UUserData*> UserDatas;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<URoomData*> RoomDataPool;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<URoomData*> RoomDatas;
-
-	TUniquePtr<BaseCommand> loginCommand;
-	TArray<TUniquePtr<BaseCommand>> Commands;
-	TArray<int32> CommandBypassCount;
-
-	static constexpr int32 NO_COMMAND = -1;
-	int32 CurrentCommand = NO_COMMAND;
-
-	bool IsLoginState = true;
-public:
 	bool ProcessLine(const FString& line);
 
 	void PostStartChangedOfUserData();

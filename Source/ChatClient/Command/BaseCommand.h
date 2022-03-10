@@ -30,10 +30,11 @@ protected:
 public:
 	BaseCommand(FCommandProcessor& processor);
 	virtual ~BaseCommand() = default;
-	virtual ECommandStatus ProcessCommand(const FString& line) = 0;
 
 	BaseCommand(const BaseCommand&) = delete;
 	BaseCommand& operator=(const BaseCommand&) = delete;
+
+	virtual ECommandStatus ProcessCommand(const FString& line) = 0;
 protected:
 	static bool IsLineToken(const FString& targetLine);
 	static bool IsSameTitle(const FString& targetLine, const FString& predTitle);
