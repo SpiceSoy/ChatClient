@@ -6,7 +6,6 @@
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/RichTextBlock.h"
-#include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
 
 void UChatPageWidget::NativeOnInitialized()
@@ -18,8 +17,6 @@ void UChatPageWidget::NativeOnInitialized()
 	TextBoxChat = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("TB_Chat")));
 	TextBoxChat->OnTextCommitted.AddDynamic(this, &UChatPageWidget::OnTextCommittedChat);
 
-	TextTitle = Cast<UTextBlock>(GetWidgetFromName(TEXT("T_Title")));
-
 	ButtonSend = Cast<UButton>(GetWidgetFromName(TEXT("BTN_Send")));
 	ButtonSend->OnClicked.AddDynamic(this, &UChatPageWidget::OnClickedSend);
 }
@@ -27,11 +24,6 @@ void UChatPageWidget::NativeOnInitialized()
 UChatPageWidget::FClickedSend& UChatPageWidget::GetClickedSend()
 {
 	return ClickedSend;
-}
-
-void UChatPageWidget::SetTitle(const FString& str) const
-{
-	TextTitle->SetText(FText::FromString(str));
 }
 
 void UChatPageWidget::AppendLog(const FString& str) const

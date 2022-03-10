@@ -29,7 +29,6 @@ private:
 	class UTextBlock* TextTitle;
 public:
 	FClickedSend& GetClickedSend();
-	void SetTitle(const FString& str) const;
 	void AppendLog(const FString& str) const;
 	void AppendLog(const FText& text) const;
 private:

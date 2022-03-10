@@ -7,10 +7,12 @@
 #include "ChatPageWidget.h"
 #include "ConnectWidget.h"
 #include "UserListWidget.h"
+#include "RoomListWidget.h"
 #include "Command/CommandProcessor.h"
 #include "Containers/StringConv.h"
 #include <codecvt>
 #include <vector>
+#include <stdlib.h>
 
 UChatConnection::UChatConnection()
 {
@@ -38,6 +40,7 @@ bool UChatConnection::Connect(uint32 address, uint32 port)
 
 	IsConnected = Socket->Connect(*addr);
 	Socket->SetNonBlocking(true);
+	Socket->SetNoDelay(true);
 	return IsConnected;
 }
 
@@ -95,51 +98,12 @@ void UChatConnection::OnLineReceived(const FString& line)
 
 void UChatConnection::BindDelegate()
 {
-#pragma region WIDGET
-	//if (!ChatWidget.IsValid()) return;
-
-	//TWeakObjectPtr<UChatConnection> thisObjPtr = MakeWeakObjectPtr(this);
-
-	//ChatWidget->GetConnectBtnPressed().BindLambda(
-	//	[thisObjPtr](uint32 address, uint32 port)
-	//	{
-	//		if (!thisObjPtr.IsValid()) return;
-	//		UChatConnection* thisPtr = thisObjPtr.Get();
-	//		if (!thisPtr->ChatWidget.IsValid()) return;
-	//		UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
-
-	//		bool connectionResult = thisPtr->Connect(address, port);
-	//		if (connectionResult) chatWidget->AppendLog(TEXT("연결이 성공하였습니다.\n"));
-	//		else chatWidget->AppendLog(TEXT("연결이 실패하였습니다.\n"));
-	//	}
-	//);
-
-	//ChatWidget->GetChatSendBtnPressed().BindLambda(
-	//	[thisObjPtr](const FString& str)
-	//	{
-	//		if (!thisObjPtr.IsValid()) return;
-	//		UChatConnection* thisPtr = thisObjPtr.Get();
-	//		thisPtr->SendText(str);
-	//	}
-	//);
-
-	//CommandProcessor.GetChangedUserList().BindLambda(
-	//	[thisObjPtr](const TArray<UUserData*>& arr)
-	//	{
-	//		if (!thisObjPtr.IsValid()) return;
-	//		UChatConnection* thisPtr = thisObjPtr.Get();
-	//		if (!thisPtr->ChatWidget.IsValid()) return;
-	//		UChatWidget* chatWidget = thisPtr->ChatWidget.Get();
-	//		chatWidget->SetUserList(arr);
-	//	}
-	//);
-#pragma endregion
-
 	if (!ChatUi.IsValid()) return;
 	TWeakObjectPtr<UChatConnection> thisObjPtr = MakeWeakObjectPtr(this);
 	TWeakObjectPtr<UChatTemplate> chatWidget = ChatUi;
 	TWeakObjectPtr<UConnectWidget> connectWidget = ChatUi->GetConnectWidget();
 	TWeakObjectPtr<UUserListWidget> userListWidget = ChatUi->GetUserListWidget();
+	TWeakObjectPtr<URoomListWidget> roomListWidget = ChatUi->GetRoomListWidget();
 	TWeakObjectPtr<UChatPageWidget> lobbyWidget = ChatUi->GetLobbyWidget();
 
 	if (!chatWidget.IsValid()) return;
@@ -153,7 +117,15 @@ void UChatConnection::BindDelegate()
 		{
 			if (!thisObjPtr.IsValid()) return;
 			UChatConnection* thisPtr = thisObjPtr.Get();
-			thisPtr->SendText("US");
+			thisPtr->SendText(TEXT("US"));
+		}
+	);
+	chatWidget->GetChagedTabRoomList().BindLambda(
+		[thisObjPtr]()
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			thisPtr->SendText(TEXT("LT"));
 		}
 	);
 
@@ -196,7 +168,8 @@ void UChatConnection::BindDelegate()
 
 			FString idCommand = FString::Printf(TEXT("LOGIN %s"), *name);
 			thisPtr->SendText(idCommand);
-			chatWidgetPtr->SetWidgetIndex(1);
+			chatWidgetPtr->SetUserName(name);
+			chatWidgetPtr->OnClickedTabLobby();
 			UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::BINDLAMBDA_CLICKED_END"));
 		}
 	);
@@ -209,6 +182,17 @@ void UChatConnection::BindDelegate()
 			if (!userListWidget.IsValid()) return;
 			UUserListWidget* userListWidgetPtr = userListWidget.Get();
 			userListWidgetPtr->SetUserList(arr);
+		}
+	);
+
+	CommandProcessor.GetChangedRoomList().BindLambda(
+		[thisObjPtr, roomListWidget](const TArray<URoomData*>& arr)
+		{
+			if (!thisObjPtr.IsValid()) return;
+			UChatConnection* thisPtr = thisObjPtr.Get();
+			if (!roomListWidget.IsValid()) return;
+			URoomListWidget* roomListWidgetPtr = roomListWidget.Get();
+			roomListWidgetPtr->SetRoomList(arr);
 		}
 	);
 
@@ -225,10 +209,11 @@ void UChatConnection::ProcessRecv()
 	}
 	else if (byteRecved != 0)
 	{
-		RecvBytes += byteRecved;
-		uint8* csrLast = RecvBuffer.GetData();
+		//RecvBytes += byteRecved;
 		uint8* csrBegin = RecvBuffer.GetData();
-		while (csrLast != (RecvBuffer.GetData() + RecvBytes))
+		uint8* csrLast = RecvBuffer.GetData() + RecvBytes;
+		uint8* csrEnd= RecvBuffer.GetData() + RecvBytes + byteRecved;
+		while (csrLast != csrEnd)
 		{
 			if (*csrLast == '\n')
 			{
@@ -245,9 +230,13 @@ void UChatConnection::ProcessRecv()
 		}
 		if (csrBegin != csrLast)
 		{
-			FMemory::Memcpy(RecvBuffer.GetData(), csrBegin, csrLast - csrBegin + 1);
+			FMemory::Memcpy(RecvBuffer.GetData(), csrBegin, csrEnd - csrBegin);
+			RecvBytes = csrEnd - csrBegin;
 		}
-		RecvBytes = 0;
+		else
+		{
+			RecvBytes = 0;
+		}
 		UE_LOG(LogTemp, Log, TEXT("CALL UChatConnection::ProcessRecv"));
 	}
 }
@@ -316,5 +305,5 @@ uint32 UChatConnection::ConvertToMBCS(const FString& srcStr, uint8* destBuffer, 
 	const wchar_t* newWCharLast;
 	auto state = std::mbstate_t();
 	auto result = codecvt.out(state, *srcStr, *srcStr + size, newWCharLast, (char*)destBuffer, (char*)(destBuffer + size), newLast);
-	return newLast - (char*)destBuffer;
+	return strlen((const char*)destBuffer) + 1;
 }

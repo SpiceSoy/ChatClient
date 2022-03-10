@@ -27,4 +27,7 @@ public:
 
 	BaseCommand(const BaseCommand&) = delete;
 	BaseCommand& operator=(const BaseCommand&) = delete;
+protected:
+	static bool IsLineToken(const FString& targetLine);
+	static bool IsSameTitle(const FString& targetLine, const FString& predTitle);
 };

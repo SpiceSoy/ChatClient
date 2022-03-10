@@ -14,7 +14,7 @@ ECommandStatus CommandUserList::ProcessCommand(const FString& line)
 {
 	static bool isCurrentSet = false;
 	static TArray<FString> tokens;
-	bool isStartLine = line.StartsWith(TEXT("--------------------"));
+	bool isStartLine = IsLineToken(line);
 	if(isCurrentSet)
 	{
 		if(isStartLine)
@@ -33,10 +33,7 @@ ECommandStatus CommandUserList::ProcessCommand(const FString& line)
 	}
 	else if(isStartLine)
 	{
-		int32 startIndex = 0;
-		int32 endIndex = 0;
-		bool isTitle = line.FindChar(TEXT('['), startIndex) || line.FindChar(TEXT(']'), endIndex);
-		if(isTitle)
+		if(IsSameTitle(line, TEXT("이용자 목록")))
 		{
 			isCurrentSet = true;
 			Processor.PostStartChangedOfUserData();

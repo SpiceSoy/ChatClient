@@ -18,6 +18,12 @@ protected:
 	virtual void NativeOnInitialized() override;
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UTextBlock* TextTitle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UTextBlock* TextName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ButtonTabConnect = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -25,6 +31,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UButton* ButtonTabUserList = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UButton* ButtonTabRoomList = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UWidgetSwitcher* WidgetSwitcher = nullptr;
@@ -38,9 +47,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UUserListWidget* UserListWidget = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class URoomListWidget* RoomListWidget = nullptr;
+
 	FChangedTab ChagedTabConnect;
 	FChangedTab ChagedTabLobby;
 	FChangedTab ChagedTabUserList;
+	FChangedTab ChagedTabRoomList;
 
 public:
 	UFUNCTION()
@@ -49,15 +62,21 @@ public:
 	void OnClickedTabLobby();
 	UFUNCTION()
 	void OnClickedTabUserList();
+	UFUNCTION()
+	void OnClickedTabRoomList();
 
 	void SetWidgetIndex(int32 index) const;
+	void SetTitle(const FString& title) const;
+	void SetUserName(const FString& title) const;
 
 	TWeakObjectPtr<UConnectWidget> GetConnectWidget() const;
 	TWeakObjectPtr<UChatPageWidget> GetLobbyWidget() const;
 	TWeakObjectPtr<UUserListWidget> GetUserListWidget() const;
+	TWeakObjectPtr<URoomListWidget> GetRoomListWidget() const;
 
 	FChangedTab& GetChagedTabConnect();
 	FChangedTab& GetChagedTabLobby();
 	FChangedTab& GetChagedTabUserList();
+	FChangedTab& GetChagedTabRoomList();
 
 };
