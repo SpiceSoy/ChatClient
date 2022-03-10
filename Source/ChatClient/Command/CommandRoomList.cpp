@@ -1,8 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file CommandRoomList.cpp
+//
+// @brief 대화방 목록을 파싱하기 위한 커맨드 클래스입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
-#include "CommandRoomList.h"
-#include "CommandProcessor.h"
+#include "Command/CommandRoomList.h"
+#include "Command/CommandProcessor.h"
+
 
 CommandRoomList::CommandRoomList(FCommandProcessor& processor)
 	: BaseCommand(processor)
@@ -14,9 +23,9 @@ ECommandStatus CommandRoomList::ProcessCommand(const FString& line)
 {
 	static bool isCurrentSet = false;
 	bool isStartLine = IsLineToken(line);
-	if(isCurrentSet)
+	if (isCurrentSet)
 	{
-		if(isStartLine)
+		if (isStartLine)
 		{
 			isCurrentSet = false;
 			Processor.PostCompleteChangedOfRoomData();
@@ -29,13 +38,13 @@ ECommandStatus CommandRoomList::ProcessCommand(const FString& line)
 			int32 maxUser = 0;
 			FString title;
 			ParseRoomData(line, index, currentUser, maxUser, title);
-			
+
 			Processor.AddRoomList(index, title, currentUser, maxUser);
 		}
 	}
-	else if(isStartLine)
+	else if (isStartLine)
 	{
-		if(IsSameTitle(line, TEXT("대화방 목록")))
+		if (IsSameTitle(line, TEXT("대화방 목록")))
 		{
 			isCurrentSet = true;
 			Processor.PostStartChangedOfRoomData();

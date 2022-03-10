@@ -1,18 +1,26 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file CommandProcessor.cpp
+//
+// @brief 로그인 처리를 하기 위한 커맨드 클래스 입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
-#include "CommandProcessor.h"
-#include "CommandEnterRoom.h"
-#include "CommandLogin.h"
-#include "CommandQuitRoom.h"
-#include "CommandRoomList.h"
-#include "CommandUserList.h"
-#include "BaseCommand.h"
+#include "Command/CommandProcessor.h"
+#include "Command/BaseCommand.h"
+#include "Command/CommandEnterRoom.h"
+#include "Command/CommandLogin.h"
+#include "Command/CommandQuitRoom.h"
+#include "Command/CommandRoomList.h"
+#include "Command/CommandUserList.h"
+
 
 FCommandProcessor::FCommandProcessor()
 {
 	loginCommand = MakeUnique<CommandLogin>(*this);
-
 	Commands.Add(MakeUnique<CommandUserList>(*this));
 	Commands.Add(MakeUnique<CommandRoomList>(*this));
 	Commands.Add(MakeUnique<CommandEnterRoom>(*this));
@@ -31,10 +39,7 @@ void FCommandProcessor::PostStartChangedOfUserData()
 void FCommandProcessor::AddUserList(const FString& name, const FString& addr)
 {
 	int32 newIndex = UserDatas.Num();
-	if (newIndex <= UserDataPool.Num())
-	{
-		UserDataPool.Emplace(NewObject<UUserData>());
-	}
+	if (newIndex <= UserDataPool.Num()) UserDataPool.Emplace(NewObject<UUserData>());
 	UUserData* ptr = UserDataPool[newIndex];
 	ptr->Set(name, addr);
 	UserDatas.Add(ptr);
@@ -42,7 +47,7 @@ void FCommandProcessor::AddUserList(const FString& name, const FString& addr)
 
 void FCommandProcessor::PostCompleteChangedOfUserData()
 {
-	if (ChangedUserList.IsBound()) ChangedUserList.Execute(UserDatas);
+	ChangedUserList.ExecuteIfBound(UserDatas);
 }
 
 void FCommandProcessor::PostStartChangedOfRoomData()
@@ -53,10 +58,7 @@ void FCommandProcessor::PostStartChangedOfRoomData()
 void FCommandProcessor::AddRoomList(int32 index, const FString& title, int32 current, int32 max)
 {
 	int32 newIndex = RoomDatas.Num();
-	if (newIndex <= RoomDataPool.Num())
-	{
-		RoomDataPool.Emplace(NewObject<URoomData>());
-	}
+	if (newIndex <= RoomDataPool.Num()) RoomDataPool.Emplace(NewObject<URoomData>());
 	URoomData* ptr = RoomDataPool[newIndex];
 	ptr->Set(index, title, current, max);
 	RoomDatas.Add(ptr);
@@ -64,7 +66,7 @@ void FCommandProcessor::AddRoomList(int32 index, const FString& title, int32 cur
 
 void FCommandProcessor::PostCompleteChangedOfRoomData()
 {
-	if (ChangedRoomList.IsBound()) ChangedRoomList.Execute(RoomDatas);
+	ChangedRoomList.ExecuteIfBound(RoomDatas);
 }
 
 void FCommandProcessor::PostLoginComplete()
@@ -128,7 +130,7 @@ bool FCommandProcessor::ProcessLine(const FString& line)
 {
 	UE_LOG(LogTemp, Log, TEXT("%s"), *line);
 
-	if(IsLoginState && loginCommand)
+	if (IsLoginState && loginCommand)
 	{
 		loginCommand->ProcessCommand(line);
 		return false;

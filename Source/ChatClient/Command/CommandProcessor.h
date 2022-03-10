@@ -1,11 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file CommandProcessor.h
+//
+// @brief 커맨드 모음 및 커맨드 처리, 이벤트 통지를 위한 모음 클래스 입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
+
 
 #pragma once
-
+#include "Command/BaseCommand.h"
+#include "RoomData.h"
+#include "UserData.h"
 #include "CoreMinimal.h"
-#include "BaseCommand.h"
-#include "../UserData.h"
-#include "../RoomData.h"
 
 
 /**

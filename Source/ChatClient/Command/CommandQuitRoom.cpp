@@ -1,8 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//=================================================================================================
+// @file CommandQuitRoom.h
+//
+// @brief 대화방 종료를 위한 커맨드 클래스입니다.
+//
+// @date 2022/03/08
+//
+// Copyright 2022 Netmarble Neo, Inc. All Rights Reserved.
+//=================================================================================================
 
 
-#include "CommandQuitRoom.h"
-#include "CommandProcessor.h"
+#include "Command/CommandQuitRoom.h"
+#include "Command/CommandProcessor.h"
+
 
 CommandQuitRoom::CommandQuitRoom(FCommandProcessor& processor)
 	: BaseCommand(processor)
